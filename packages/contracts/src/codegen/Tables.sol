@@ -9,3 +9,5 @@ import { VRFRequestNonce, VRFRequestNonceTableId } from "./tables/VRFRequestNonc
 import { VRFRequestTable, VRFRequestTableTableId } from "./tables/VRFRequestTable.sol";
 import { RequestIdToRaffleId, RequestIdToRaffleIdTableId } from "./tables/RequestIdToRaffleId.sol";
 import { VRFRequestTableV2, VRFRequestTableV2Data, VRFRequestTableV2TableId } from "./tables/VRFRequestTableV2.sol";
+import { BlackJack, BlackJackData, BlackJackTableId } from "./tables/BlackJack.sol";
+import { RequestIdToBlackJackUser, RequestIdToBlackJackUserTableId } from "./tables/RequestIdToBlackJackUser.sol";

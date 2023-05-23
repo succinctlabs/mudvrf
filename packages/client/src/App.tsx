@@ -6,7 +6,7 @@ export const App = () => {
   const {
     components: { RaffleCounter },
     systemCalls: { startNewRaffle, buyTicket, endRaffle },
-    network: { storeCache, singletonEntity },
+    network: { storeCache, singletonEntity, worldContract },
   } = useMUD();
 
   const raffleId = useComponentValue(RaffleCounter, singletonEntity);
@@ -26,8 +26,59 @@ export const App = () => {
     console.log(JSON.parse(event.target.value));
   }
 
+  const [msgSender, setMsgSender] = useState("");
+  const [nonce, setNonce] = useState(BigInt(0));
+  const [blockNumber, setBlockNumber] = useState(BigInt(0));
+  const [callbackGasLimit, setCallbackGasLimit] = useState(BigInt(0));
+  const [nbWords, setNbWords] = useState(BigInt(0));
+  const [callbackSelector, setCallbackSelector] = useState("");
+
+  worldContract.on("StoreSetRecord", (table, key, data) => {
+    if (table !== '0x00000000000000000000000000000000565246526571756573745461626c6556') {
+      console.log("wrong table", table);
+      return;
+    }
+
+    const bytes: string = data.slice(2);
+
+    let offset = 0;
+    const msgSender = "0x" + bytes.slice(offset, offset + 40);
+    offset += 40;
+
+    const nonce = BigInt("0x" + bytes.slice(offset, offset + 64));
+    offset += 64;
+
+    const blockNumber = BigInt("0x" + bytes.slice(offset, offset + 64));
+    offset += 64;
+
+    const callbackGasLimit = BigInt("0x" + bytes.slice(offset, offset + 8));
+    offset += 8;
+
+    const nbWords = BigInt("0x" + bytes.slice(offset, offset + 8));
+    offset += 8;
+
+    const callbackSelector = "0x" + bytes.slice(offset, offset + 8);
+    offset += 8;
+
+    // console.log(msgSender, nonce, blockNumber, callbackGasLimit, nbWords, callbackSelector);
+    setMsgSender(msgSender);
+    setNonce(nonce);
+    setBlockNumber(blockNumber);
+    setCallbackGasLimit(callbackGasLimit);
+    setNbWords(nbWords);
+    setCallbackSelector(callbackSelector);
+  });
+
   return (
     <>
+      Latest VRF Request
+      <br></br>
+      <p>msgSender: {msgSender}</p>
+      <p>nonce: {nonce.toString()}</p>
+      <p>blockNumber: {blockNumber.toString()}</p>
+      <p>callbackGasLimit: {callbackGasLimit.toString()}</p>
+      <p>nbWords: {nbWords.toString()}</p>
+      <p>callbackSelector: {callbackSelector.toString()}</p>
       <button onClick={startNewRaffle}>Start New Raffle</button>
       <br></br>
       <input
