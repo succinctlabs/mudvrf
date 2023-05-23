@@ -46,6 +46,25 @@ export default mudConfig({
         nbWords: "uint32",
         callbackSelector: "bytes4"
       }
+    },
+    BlackJack: {
+      keySchema: {
+        userAddress: "address"
+      },
+      schema: {
+        userCards: "uint256[]",
+        dealerCards: "uint256[]",
+        userWins: "uint256",
+        userLosses: "uint256",
+      }
+    },
+    RequestIdToBlackJackUser: {
+      keySchema: {
+        requestId: "bytes32"
+      },
+      schema: {
+        user: "address"
+      }
     }
   },
 });

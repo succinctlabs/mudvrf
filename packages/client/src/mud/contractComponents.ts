@@ -100,5 +100,38 @@ export function defineContractComponents(world: World) {
         }
       );
     })(),
+    BlackJack: (() => {
+      const tableId = new TableId("", "BlackJack");
+      return defineComponent(
+        world,
+        {
+          userCards: RecsType.BigIntArray,
+          dealerCards: RecsType.BigIntArray,
+          userWins: RecsType.BigInt,
+          userLosses: RecsType.BigInt,
+        },
+        {
+          metadata: {
+            contractId: tableId.toHexString(),
+            tableId: tableId.toString(),
+          },
+        }
+      );
+    })(),
+    RequestIdToBlackJackUser: (() => {
+      const tableId = new TableId("", "RequestIdToBlack");
+      return defineComponent(
+        world,
+        {
+          user: RecsType.String,
+        },
+        {
+          metadata: {
+            contractId: tableId.toHexString(),
+            tableId: tableId.toString(),
+          },
+        }
+      );
+    })(),
   };
 }
