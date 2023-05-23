@@ -24,6 +24,7 @@ struct BlackJackData {
   uint256 userWins;
   uint256 userLosses;
   bool gameEnded;
+  bool userWon;
   uint256[] userCards;
   uint256[] dealerCards;
 }
@@ -31,12 +32,13 @@ struct BlackJackData {
 library BlackJack {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
-    SchemaType[] memory _schema = new SchemaType[](5);
+    SchemaType[] memory _schema = new SchemaType[](6);
     _schema[0] = SchemaType.UINT256;
     _schema[1] = SchemaType.UINT256;
     _schema[2] = SchemaType.BOOL;
-    _schema[3] = SchemaType.UINT256_ARRAY;
+    _schema[3] = SchemaType.BOOL;
     _schema[4] = SchemaType.UINT256_ARRAY;
+    _schema[5] = SchemaType.UINT256_ARRAY;
 
     return SchemaLib.encode(_schema);
   }
@@ -50,12 +52,13 @@ library BlackJack {
 
   /** Get the table's metadata */
   function getMetadata() internal pure returns (string memory, string[] memory) {
-    string[] memory _fieldNames = new string[](5);
+    string[] memory _fieldNames = new string[](6);
     _fieldNames[0] = "userWins";
     _fieldNames[1] = "userLosses";
     _fieldNames[2] = "gameEnded";
-    _fieldNames[3] = "userCards";
-    _fieldNames[4] = "dealerCards";
+    _fieldNames[3] = "userWon";
+    _fieldNames[4] = "userCards";
+    _fieldNames[5] = "dealerCards";
     return ("BlackJack", _fieldNames);
   }
 
@@ -183,12 +186,46 @@ library BlackJack {
     _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((gameEnded)));
   }
 
+  /** Get userWon */
+  function getUserWon(address userAddress) internal view returns (bool userWon) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
+    return (_toBool(uint8(Bytes.slice1(_blob, 0))));
+  }
+
+  /** Get userWon (using the specified store) */
+  function getUserWon(IStore _store, address userAddress) internal view returns (bool userWon) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
+    return (_toBool(uint8(Bytes.slice1(_blob, 0))));
+  }
+
+  /** Set userWon */
+  function setUserWon(address userAddress, bool userWon) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    StoreSwitch.setField(_tableId, _keyTuple, 3, abi.encodePacked((userWon)));
+  }
+
+  /** Set userWon (using the specified store) */
+  function setUserWon(IStore _store, address userAddress, bool userWon) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    _store.setField(_tableId, _keyTuple, 3, abi.encodePacked((userWon)));
+  }
+
   /** Get userCards */
   function getUserCards(address userAddress) internal view returns (uint256[] memory userCards) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 4);
     return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint256());
   }
 
@@ -197,7 +234,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 4);
     return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint256());
   }
 
@@ -206,7 +243,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    StoreSwitch.setField(_tableId, _keyTuple, 3, EncodeArray.encode((userCards)));
+    StoreSwitch.setField(_tableId, _keyTuple, 4, EncodeArray.encode((userCards)));
   }
 
   /** Set userCards (using the specified store) */
@@ -214,7 +251,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    _store.setField(_tableId, _keyTuple, 3, EncodeArray.encode((userCards)));
+    _store.setField(_tableId, _keyTuple, 4, EncodeArray.encode((userCards)));
   }
 
   /** Get the length of userCards */
@@ -222,7 +259,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 3, getSchema());
+    uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 4, getSchema());
     return _byteLength / 32;
   }
 
@@ -231,7 +268,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 3, getSchema());
+    uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 4, getSchema());
     return _byteLength / 32;
   }
 
@@ -240,7 +277,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 3, getSchema(), _index * 32, (_index + 1) * 32);
+    bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 4, getSchema(), _index * 32, (_index + 1) * 32);
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
@@ -249,7 +286,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 3, getSchema(), _index * 32, (_index + 1) * 32);
+    bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 4, getSchema(), _index * 32, (_index + 1) * 32);
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
@@ -258,7 +295,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    StoreSwitch.pushToField(_tableId, _keyTuple, 3, abi.encodePacked((_element)));
+    StoreSwitch.pushToField(_tableId, _keyTuple, 4, abi.encodePacked((_element)));
   }
 
   /** Push an element to userCards (using the specified store) */
@@ -266,7 +303,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    _store.pushToField(_tableId, _keyTuple, 3, abi.encodePacked((_element)));
+    _store.pushToField(_tableId, _keyTuple, 4, abi.encodePacked((_element)));
   }
 
   /** Pop an element from userCards */
@@ -274,7 +311,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    StoreSwitch.popFromField(_tableId, _keyTuple, 3, 32);
+    StoreSwitch.popFromField(_tableId, _keyTuple, 4, 32);
   }
 
   /** Pop an element from userCards (using the specified store) */
@@ -282,7 +319,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    _store.popFromField(_tableId, _keyTuple, 3, 32);
+    _store.popFromField(_tableId, _keyTuple, 4, 32);
   }
 
   /** Update an element of userCards at `_index` */
@@ -290,7 +327,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    StoreSwitch.updateInField(_tableId, _keyTuple, 3, _index * 32, abi.encodePacked((_element)));
+    StoreSwitch.updateInField(_tableId, _keyTuple, 4, _index * 32, abi.encodePacked((_element)));
   }
 
   /** Update an element of userCards (using the specified store) at `_index` */
@@ -298,7 +335,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    _store.updateInField(_tableId, _keyTuple, 3, _index * 32, abi.encodePacked((_element)));
+    _store.updateInField(_tableId, _keyTuple, 4, _index * 32, abi.encodePacked((_element)));
   }
 
   /** Get dealerCards */
@@ -306,7 +343,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 4);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 5);
     return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint256());
   }
 
@@ -315,7 +352,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 4);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 5);
     return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint256());
   }
 
@@ -324,7 +361,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    StoreSwitch.setField(_tableId, _keyTuple, 4, EncodeArray.encode((dealerCards)));
+    StoreSwitch.setField(_tableId, _keyTuple, 5, EncodeArray.encode((dealerCards)));
   }
 
   /** Set dealerCards (using the specified store) */
@@ -332,7 +369,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    _store.setField(_tableId, _keyTuple, 4, EncodeArray.encode((dealerCards)));
+    _store.setField(_tableId, _keyTuple, 5, EncodeArray.encode((dealerCards)));
   }
 
   /** Get the length of dealerCards */
@@ -340,7 +377,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 4, getSchema());
+    uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 5, getSchema());
     return _byteLength / 32;
   }
 
@@ -349,7 +386,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 4, getSchema());
+    uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 5, getSchema());
     return _byteLength / 32;
   }
 
@@ -358,7 +395,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 4, getSchema(), _index * 32, (_index + 1) * 32);
+    bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 5, getSchema(), _index * 32, (_index + 1) * 32);
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
@@ -367,7 +404,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 4, getSchema(), _index * 32, (_index + 1) * 32);
+    bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 5, getSchema(), _index * 32, (_index + 1) * 32);
     return (uint256(Bytes.slice32(_blob, 0)));
   }
 
@@ -376,7 +413,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    StoreSwitch.pushToField(_tableId, _keyTuple, 4, abi.encodePacked((_element)));
+    StoreSwitch.pushToField(_tableId, _keyTuple, 5, abi.encodePacked((_element)));
   }
 
   /** Push an element to dealerCards (using the specified store) */
@@ -384,7 +421,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    _store.pushToField(_tableId, _keyTuple, 4, abi.encodePacked((_element)));
+    _store.pushToField(_tableId, _keyTuple, 5, abi.encodePacked((_element)));
   }
 
   /** Pop an element from dealerCards */
@@ -392,7 +429,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    StoreSwitch.popFromField(_tableId, _keyTuple, 4, 32);
+    StoreSwitch.popFromField(_tableId, _keyTuple, 5, 32);
   }
 
   /** Pop an element from dealerCards (using the specified store) */
@@ -400,7 +437,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    _store.popFromField(_tableId, _keyTuple, 4, 32);
+    _store.popFromField(_tableId, _keyTuple, 5, 32);
   }
 
   /** Update an element of dealerCards at `_index` */
@@ -408,7 +445,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    StoreSwitch.updateInField(_tableId, _keyTuple, 4, _index * 32, abi.encodePacked((_element)));
+    StoreSwitch.updateInField(_tableId, _keyTuple, 5, _index * 32, abi.encodePacked((_element)));
   }
 
   /** Update an element of dealerCards (using the specified store) at `_index` */
@@ -416,7 +453,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    _store.updateInField(_tableId, _keyTuple, 4, _index * 32, abi.encodePacked((_element)));
+    _store.updateInField(_tableId, _keyTuple, 5, _index * 32, abi.encodePacked((_element)));
   }
 
   /** Get the full data */
@@ -443,10 +480,11 @@ library BlackJack {
     uint256 userWins,
     uint256 userLosses,
     bool gameEnded,
+    bool userWon,
     uint256[] memory userCards,
     uint256[] memory dealerCards
   ) internal {
-    bytes memory _data = encode(userWins, userLosses, gameEnded, userCards, dealerCards);
+    bytes memory _data = encode(userWins, userLosses, gameEnded, userWon, userCards, dealerCards);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
@@ -461,10 +499,11 @@ library BlackJack {
     uint256 userWins,
     uint256 userLosses,
     bool gameEnded,
+    bool userWon,
     uint256[] memory userCards,
     uint256[] memory dealerCards
   ) internal {
-    bytes memory _data = encode(userWins, userLosses, gameEnded, userCards, dealerCards);
+    bytes memory _data = encode(userWins, userLosses, gameEnded, userWon, userCards, dealerCards);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
@@ -474,7 +513,15 @@ library BlackJack {
 
   /** Set the full data using the data struct */
   function set(address userAddress, BlackJackData memory _table) internal {
-    set(userAddress, _table.userWins, _table.userLosses, _table.gameEnded, _table.userCards, _table.dealerCards);
+    set(
+      userAddress,
+      _table.userWins,
+      _table.userLosses,
+      _table.gameEnded,
+      _table.userWon,
+      _table.userCards,
+      _table.dealerCards
+    );
   }
 
   /** Set the full data using the data struct (using the specified store) */
@@ -485,6 +532,7 @@ library BlackJack {
       _table.userWins,
       _table.userLosses,
       _table.gameEnded,
+      _table.userWon,
       _table.userCards,
       _table.dealerCards
     );
@@ -492,8 +540,8 @@ library BlackJack {
 
   /** Decode the tightly packed blob using this table's schema */
   function decode(bytes memory _blob) internal view returns (BlackJackData memory _table) {
-    // 65 is the total byte length of static data
-    PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 65));
+    // 66 is the total byte length of static data
+    PackedCounter _encodedLengths = PackedCounter.wrap(Bytes.slice32(_blob, 66));
 
     _table.userWins = (uint256(Bytes.slice32(_blob, 0)));
 
@@ -501,11 +549,13 @@ library BlackJack {
 
     _table.gameEnded = (_toBool(uint8(Bytes.slice1(_blob, 64))));
 
+    _table.userWon = (_toBool(uint8(Bytes.slice1(_blob, 65))));
+
     // Store trims the blob if dynamic fields are all empty
-    if (_blob.length > 65) {
+    if (_blob.length > 66) {
       uint256 _start;
       // skip static data length + dynamic lengths word
-      uint256 _end = 97;
+      uint256 _end = 98;
 
       _start = _end;
       _end += _encodedLengths.atIndex(0);
@@ -522,6 +572,7 @@ library BlackJack {
     uint256 userWins,
     uint256 userLosses,
     bool gameEnded,
+    bool userWon,
     uint256[] memory userCards,
     uint256[] memory dealerCards
   ) internal view returns (bytes memory) {
@@ -535,6 +586,7 @@ library BlackJack {
         userWins,
         userLosses,
         gameEnded,
+        userWon,
         _encodedLengths.unwrap(),
         EncodeArray.encode((userCards)),
         EncodeArray.encode((dealerCards))

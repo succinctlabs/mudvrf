@@ -73,7 +73,7 @@ contract BlackJackSystem is System {
 
         uint256 userWins = BlackJack.getUserWins(user);
         uint256 userLosses = BlackJack.getUserLosses(user);
-        BlackJack.set(user, userWins, userLosses, false, userCards, dealerCards);
+        BlackJack.set(user, userWins, userLosses, false, false, userCards, dealerCards);
     }
 
     function dealUser() public {
@@ -94,12 +94,15 @@ contract BlackJackSystem is System {
         if (valueOfCards[0] > 21 && valueOfCards[1] > 21) {
             uint256 userLosses = BlackJack.getUserLosses(user);
             BlackJack.setUserLosses(user, userLosses + 1);
+            BlackJack.setUserWon(user, false);
+            BlackJack.setGameEnded(user, true);
         } else if (valueOfCards[0] == 21 || valueOfCards[1] == 21) {
             uint256 userWins = BlackJack.getUserWins(user);
             BlackJack.setUserWins(user, userWins + 1);
+            BlackJack.setUserWon(user, true);
+            BlackJack.setGameEnded(user, true);
         }
 
-        BlackJack.setGameEnded(user, true);
     }
 
     function standUser() public {
@@ -123,6 +126,7 @@ contract BlackJackSystem is System {
             (valueOfUserCards[0] == 21 || valueOfUserCards[1] == 21)
                 && (valueOfDealerCards[0] == 21 || valueOfDealerCards[1] == 21)
         ) {
+            BlackJack.setUserWon(user, false);
             BlackJack.setGameEnded(user, true);
             return;
         }
@@ -132,6 +136,7 @@ contract BlackJackSystem is System {
             (valueOfUserCards[0] > 21 && valueOfUserCards[1] > 21)
                 && (valueOfDealerCards[0] > 21 && valueOfDealerCards[1] > 21)
         ) {
+            BlackJack.setUserWon(user, false);
             BlackJack.setGameEnded(user, true);
             return;
         }
@@ -139,6 +144,7 @@ contract BlackJackSystem is System {
         // User goes over 21.
         if (valueOfUserCards[0] > 21 && valueOfUserCards[1] > 21) {
             uint256 userLosses = BlackJack.getUserLosses(user);
+            BlackJack.setUserWon(user, false);
             BlackJack.setUserLosses(user, userLosses + 1);
             BlackJack.setGameEnded(user, true);
             return;
@@ -147,6 +153,7 @@ contract BlackJackSystem is System {
         // Opponent goes over 21.
         if (valueOfDealerCards[0] > 21 && valueOfDealerCards[1] > 21) {
             uint256 userWins = BlackJack.getUserWins(user);
+            BlackJack.setUserWon(user, true);
             BlackJack.setUserWins(user, userWins + 1);
             BlackJack.setGameEnded(user, true);
             return;
@@ -171,10 +178,14 @@ contract BlackJackSystem is System {
         // Evaluate result.
         if (userBestCard > dealerBestCard) {
             uint256 userWins = BlackJack.getUserWins(user);
+            BlackJack.setUserWon(user, true);
             BlackJack.setUserWins(user, userWins + 1);
         } else if (userBestCard < dealerBestCard) {
             uint256 userLosses = BlackJack.getUserLosses(user);
+            BlackJack.setUserWon(user, false);
             BlackJack.setUserLosses(user, userLosses + 1);
+        } else {
+            BlackJack.setUserWon(user, false);
         }
         BlackJack.setGameEnded(user, true);
     }

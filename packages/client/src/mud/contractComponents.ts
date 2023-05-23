@@ -108,6 +108,7 @@ export function defineContractComponents(world: World) {
           userWins: RecsType.BigInt,
           userLosses: RecsType.BigInt,
           gameEnded: RecsType.Boolean,
+          userWon: RecsType.Boolean,
           userCards: RecsType.BigIntArray,
           dealerCards: RecsType.BigIntArray,
         },

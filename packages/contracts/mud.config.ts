@@ -55,6 +55,7 @@ export default mudConfig({
         userWins: "uint256",
         userLosses: "uint256",
         gameEnded: "bool",
+        userWon: "bool",
         userCards: "uint256[]",
         dealerCards: "uint256[]",
       }

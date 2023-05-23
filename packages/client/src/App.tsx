@@ -2,6 +2,7 @@ import { useComponentValue, useRow, useRows } from "@latticexyz/react";
 import { useMUD } from "./MUDContext";
 import { useEffect, useState } from "react";
 import { world } from "./mud/world";
+import './App.css'
 
 export const App = () => {
   const {
@@ -158,15 +159,24 @@ export const App = () => {
 
   return (
     <>
-      Latest VRF Request
-      <br></br>
-      <p>msgSender: {msgSender}</p>
-      <p>nonce: {nonce.toString()}</p>
-      <p>blockNumber: {blockNumber.toString()}</p>
-      <p>callbackGasLimit: {callbackGasLimit.toString()}</p>
-      <p>nbWords: {nbWords.toString()}</p>
-      <p>callbackSelector: {callbackSelector.toString()}</p>
-      {/* <button onClick={startNewRaffle}>Start New Raffle</button> */}
+    <div style={{backgroundColor: ""}}>
+      <h1>MUDVRF🎲</h1>
+      <code>
+        <pre>
+        ____
+ /\' .\    _____
+/: \___\  / .  /\
+\' / . / /____/..\
+ \/___/  \'  '\  /
+          \'__'\/
+          ____
+ /\' .\    _____
+/: \___\  / .  /\
+\' / . / /____/..\
+ \/___/  \'  '\  /
+          \'__'\/
+        </pre>
+      </code>
       <br></br>
       <button
         onClick={() => startGame()}
@@ -184,12 +194,19 @@ export const App = () => {
           <div>
             Dealer cards:{" "}
             {game.value.dealerCards.map((card) => getCard(card)).join(", ")}
+            ({renderHandTotal(game.value.dealerCards)})
           </div>
           <div>
             Your cards:{" "}
             {game.value.userCards.map((card) => getCard(card)).join(", ")} (
             {renderHandTotal(game.value.userCards)})
           </div>
+          <div>
+            Game Status: {game.value.userWon ? "Win" : "Lose"}
+          </div>
+          <div>
+            Game Ended: {game.value.gameEnded ? "Yes" : "No"}
+            </div>
           <br></br>
           <button onClick={dealUser}>Hit</button>
           <button onClick={standUser} style={{ marginLeft: "6px" }}>
@@ -199,28 +216,7 @@ export const App = () => {
       )}
       <br></br>
       <br></br>
-      {/* <input
-        type="text"
-        name="name"
-        onChange={onChangeHandler}
-        value={inputRaffleId}
-      />
-      <button onClick={() => {buyTicket(inputRaffleId)}}>Buy Raffle Ticket</button>
-      <button onClick={() => {endRaffle(inputRaffleId)}}>End Raffle</button>
-      <p>Raffle Id: {raffleId?.value}</p>
-      {raffles.map((raffle) => (
-        <p>
-          ID: {raffle.key.raffleId} Tickets: [{raffle.value.tickets.join(",")}]
-        </p>
-      ))} */}
-      {/* VRF Proof JSON
-      <input type="text" name="VRF Proof JSON" onChange={onProofChangeHandler} />
-      <br></br>
-      VRF Request JSON
-      <input type="text" name="VRF Request JSON" onChange={onRequestChangeHandler} />
-      <br></br>
-      <br></br>
-      <button>VRF Coordinator Callback</button> */}
+    </div>
     </>
   );
 };
