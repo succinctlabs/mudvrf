@@ -69,19 +69,19 @@ contract VRFSystem is System, VRF {
         }
         VRFRequestTableV2.deleteRecord(requestId);
 
-        // uint256 randomness = VRF.randomValueFromVRFProof(_proof, _proof.seed);
-        // uint256[] memory randomWords = new uint256[](_request.nbWords);
-        // for (uint256 i = 0; i < _request.nbWords; i++) {
-        //     randomWords[i] = uint256(keccak256(abi.encode(randomness, i)));
-        // }
+        uint256 randomness = VRF.randomValueFromVRFProof(_proof, _proof.seed);
+        uint256[] memory randomWords = new uint256[](_request.nbWords);
+        for (uint256 i = 0; i < _request.nbWords; i++) {
+            randomWords[i] = uint256(keccak256(abi.encode(randomness, i)));
+        }
 
-        // bytes memory callbackCall = abi.encodeWithSelector(_request.callbackSelector, requestId, randomWords);
-        // (bool status,) = _world().call(callbackCall);
+        bytes memory callbackCall = abi.encodeWithSelector(_request.callbackSelector, requestId, randomWords);
+        (bool status,) = _world().call(callbackCall);
 
-        // if (!status) {
-        //     revert FailedToFulfillRandomness();
-        // }
+        if (!status) {
+            revert FailedToFulfillRandomness();
+        }
 
-        // emit FulfilledRandomness(requestId, randomWords);
+        emit FulfilledRandomness(requestId, randomWords);
     }
 }

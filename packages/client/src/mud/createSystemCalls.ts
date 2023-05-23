@@ -31,10 +31,16 @@ export function createSystemCalls(
     await awaitStreamValue(txReduced$, (txHash) => txHash === tx.hash);
   }
 
+  const startGame = async () => {
+    const tx = await worldSend("startGame", []);
+    await awaitStreamValue(txReduced$, (txHash) => txHash === tx.hash);
+  }
+
   return {
     startNewRaffle,
     buyTicket,
     endRaffle,
-    fulfillRandomness
+    fulfillRandomness,
+    startGame,
   };
 }

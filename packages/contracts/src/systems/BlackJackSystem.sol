@@ -2,7 +2,9 @@
 pragma solidity >=0.8.0;
 
 import {System} from "@latticexyz/world/src/System.sol";
-import {RaffleCounter, RaffleTable, RequestIdToRaffleId, RequestIdToBlackJackUser, BlackJack} from "../codegen/Tables.sol";
+import {
+    RaffleCounter, RaffleTable, RequestIdToRaffleId, RequestIdToBlackJackUser, BlackJack
+} from "../codegen/Tables.sol";
 import {IVRFSystem} from "../codegen/world/IVRFSystem.sol";
 import {IBlackJackSystem} from "../codegen/world/IBlackJackSystem.sol";
 
@@ -14,11 +16,7 @@ contract BlackJackSystem is System {
 
     function requestRandomness(bytes4 selector) internal returns (bytes32) {
         bytes32 requestId = IVRFSystem(_world()).requestRandomWords(
-            ORACLE_ID,
-            REQUEST_CONFIRMATIONS,
-            CALLBACK_GAS_LIMIT,
-            NB_WORDS,
-            selector
+            ORACLE_ID, REQUEST_CONFIRMATIONS, CALLBACK_GAS_LIMIT, NB_WORDS, selector
         );
         RequestIdToBlackJackUser.set(requestId, _msgSender());
         return requestId;
@@ -50,7 +48,6 @@ contract BlackJackSystem is System {
 
         return sums;
     }
-
 
     function startGame() public {
         requestRandomness(IBlackJackSystem.handleStartGame.selector);
@@ -107,8 +104,8 @@ contract BlackJackSystem is System {
     }
 
     function handleStandUser(bytes32 requestId, uint256[] memory randomWords) public {
-        address user = RequestIdToBlackJackUser.get(requestId); 
-        uint256[] memory userCards = BlackJack.getUserCards(user);  
+        address user = RequestIdToBlackJackUser.get(requestId);
+        uint256[] memory userCards = BlackJack.getUserCards(user);
         uint256[] memory dealerCards = BlackJack.getDealerCards(user);
 
         uint256[] memory newDealerCards = new uint256[](dealerCards.length + 1);
@@ -119,13 +116,19 @@ contract BlackJackSystem is System {
         uint256[] memory valueOfDealerCards = calculateValueOfCards(newDealerCards);
 
         // Tie at 21.
-        if ((valueOfUserCards[0] == 21 || valueOfUserCards[1] == 21) && (valueOfDealerCards[0] == 21 || valueOfDealerCards[1] == 21)) {
+        if (
+            (valueOfUserCards[0] == 21 || valueOfUserCards[1] == 21)
+                && (valueOfDealerCards[0] == 21 || valueOfDealerCards[1] == 21)
+        ) {
             BlackJack.setGameEnded(user, true);
             return;
         }
 
         // Tie at greater than 21.
-        if ((valueOfUserCards[0] > 21 && valueOfUserCards[1] > 21) && (valueOfDealerCards[0] > 21 && valueOfDealerCards[1] > 21)) {
+        if (
+            (valueOfUserCards[0] > 21 && valueOfUserCards[1] > 21)
+                && (valueOfDealerCards[0] > 21 && valueOfDealerCards[1] > 21)
+        ) {
             BlackJack.setGameEnded(user, true);
             return;
         }
@@ -160,7 +163,7 @@ contract BlackJackSystem is System {
             dealerBestCard = valueOfDealerCards[0];
         } else if (valueOfDealerCards[1] >= valueOfDealerCards[0] && valueOfDealerCards[1] <= 21) {
             dealerBestCard = valueOfDealerCards[1];
-        }   
+        }
 
         // Evaluate result.
         if (userBestCard > dealerBestCard) {
