@@ -36,11 +36,25 @@ export function createSystemCalls(
     await awaitStreamValue(txReduced$, (txHash) => txHash === tx.hash);
   }
 
+  const dealUser = async () => {
+    const tx = await worldSend("dealUser", []);
+    // await tx.wait();
+    // await awaitStreamValue(txReduced$, (txHash) => txHash === tx.hash);
+  }
+
+  const standUser = async () => {
+    const tx = await worldSend("standUser", []);
+    // await tx.wait();
+    // await awaitStreamValue(txReduced$, (txHash) => txHash === tx.hash);
+  }
+
   return {
     startNewRaffle,
     buyTicket,
     endRaffle,
     fulfillRandomness,
     startGame,
+    dealUser,
+    standUser,
   };
 }

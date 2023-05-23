@@ -1,16 +1,16 @@
-import { useComponentValue, useRows } from "@latticexyz/react";
+import { useComponentValue, useRow, useRows } from "@latticexyz/react";
 import { useMUD } from "./MUDContext";
 import { useEffect, useState } from "react";
+import { world } from "./mud/world";
 
 export const App = () => {
   const {
     components: { RaffleCounter },
-    systemCalls: { startGame },
+    systemCalls: { startGame, dealUser, standUser },
     network: { storeCache, singletonEntity, worldContract },
   } = useMUD();
 
   // const raffleId = useComponentValue(RaffleCounter, singletonEntity);
-  const blackjackGames = useRows(storeCache, { table: "BlackJack" });
 
   // const [inputRaffleId, setInputRaffleId] = useState(0);
 
@@ -18,7 +18,6 @@ export const App = () => {
   //   setInputRaffleId(event.target.value);
   // };
 
-  const [game, setGame] = useState<typeof blackjackGames[number] | null>(null);
   const [address, setAddress] = useState("");
 
   useEffect(() => {
@@ -28,23 +27,33 @@ export const App = () => {
     set();
   }, [worldContract.signer]);
 
-  useEffect(() => {
-    if (blackjackGames.length > 0) {
-      for (const game of blackjackGames) {
-        if (game.key.userAddress === address) {
-          setGame(game);
-          return;
-        }
-      }
-    }
-    setGame(null);
-  }, [blackjackGames]);
+  // const blackjackGames = useRows(storeCache, { table: "BlackJack" });
+  // const [game, setGame] = useState<typeof blackjackGames[number] | null>(null);
+  // useEffect(() => {
+  //   if (blackjackGames.length > 0) {
+  //     for (const game of blackjackGames) {
+  //       if (game.key.userAddress === address) {
+  //         setGame(game);
+  //         return;
+  //       }
+  //     }
+  //   }
+  //   setGame(null);
+  // }, [blackjackGames]);
+
+  // const entity = world.registerEntity({ id: address });
+
+  const game = useRow(storeCache, {
+    table: "BlackJack",
+    key: { userAddress: address as any },
+  });
 
   console.log(address, game);
 
-  if (blackjackGames.length > 0) {
-    console.log(blackjackGames[0].value.userCards);
-  }
+  // if (blackjackGames.length > 0) {
+  //   console.log(blackjackGames[0].value.userCards);
+  // }
+  // console.log("all games", blackjackGames);
 
   const onProofChangeHandler = (event: any) => {
     console.log(JSON.parse(event.target.value));
@@ -159,11 +168,16 @@ export const App = () => {
       <p>callbackSelector: {callbackSelector.toString()}</p>
       {/* <button onClick={startNewRaffle}>Start New Raffle</button> */}
       <br></br>
-      <button onClick={() => startGame()} disabled={game == null}>
+      <button
+        onClick={() => startGame()}
+        // disabled={game != null}
+      >
         Start game
       </button>
       <h2>CURRENT GAME:</h2>
-      {game === null ? (
+      {game === undefined ||
+      game === null ||
+      game.value.userCards === undefined ? (
         <div>NO GAME</div>
       ) : (
         <div key={game.key.userAddress}>
@@ -177,8 +191,10 @@ export const App = () => {
             {renderHandTotal(game.value.userCards)})
           </div>
           <br></br>
-          <button>Hit</button>
-          <button style={{ marginLeft: "6px" }}>Stand</button>
+          <button onClick={dealUser}>Hit</button>
+          <button onClick={standUser} style={{ marginLeft: "6px" }}>
+            Stand
+          </button>
         </div>
       )}
       <br></br>

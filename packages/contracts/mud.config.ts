@@ -54,9 +54,9 @@ export default mudConfig({
       schema: {
         userWins: "uint256",
         userLosses: "uint256",
+        gameEnded: "bool",
         userCards: "uint256[]",
         dealerCards: "uint256[]",
-        gameEnded: "bool"
       }
     },
     RequestIdToBlackJackUser: {

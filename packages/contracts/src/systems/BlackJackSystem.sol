@@ -73,17 +73,20 @@ contract BlackJackSystem is System {
 
         uint256 userWins = BlackJack.getUserWins(user);
         uint256 userLosses = BlackJack.getUserLosses(user);
-        BlackJack.set(user, userWins, userLosses, userCards, dealerCards, false);
+        BlackJack.set(user, userWins, userLosses, false, userCards, dealerCards);
     }
 
     function dealUser() public {
-        requestRandomness(IBlackJackSystem.handleStartGame.selector);
+        requestRandomness(IBlackJackSystem.handleDealUser.selector);
     }
 
     function handleDealUser(bytes32 requestId, uint256[] memory randomWords) public {
         address user = RequestIdToBlackJackUser.get(requestId);
         uint256[] memory userCards = BlackJack.getUserCards(user);
         uint256[] memory newUserCards = new uint256[](userCards.length + 1);
+        for (uint256 i = 0; i < userCards.length; i++) {
+            newUserCards[i] = userCards[i];
+        }
         newUserCards[userCards.length] = randomWords[0] % 52;
         BlackJack.setUserCards(user, newUserCards);
 
@@ -100,7 +103,7 @@ contract BlackJackSystem is System {
     }
 
     function standUser() public {
-        requestRandomness(IBlackJackSystem.handleStartGame.selector);
+        requestRandomness(IBlackJackSystem.handleStandUser.selector);
     }
 
     function handleStandUser(bytes32 requestId, uint256[] memory randomWords) public {

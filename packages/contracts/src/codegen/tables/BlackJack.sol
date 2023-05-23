@@ -23,9 +23,9 @@ bytes32 constant BlackJackTableId = _tableId;
 struct BlackJackData {
   uint256 userWins;
   uint256 userLosses;
+  bool gameEnded;
   uint256[] userCards;
   uint256[] dealerCards;
-  bool gameEnded;
 }
 
 library BlackJack {
@@ -34,9 +34,9 @@ library BlackJack {
     SchemaType[] memory _schema = new SchemaType[](5);
     _schema[0] = SchemaType.UINT256;
     _schema[1] = SchemaType.UINT256;
-    _schema[2] = SchemaType.UINT256_ARRAY;
+    _schema[2] = SchemaType.BOOL;
     _schema[3] = SchemaType.UINT256_ARRAY;
-    _schema[4] = SchemaType.BOOL;
+    _schema[4] = SchemaType.UINT256_ARRAY;
 
     return SchemaLib.encode(_schema);
   }
@@ -53,9 +53,9 @@ library BlackJack {
     string[] memory _fieldNames = new string[](5);
     _fieldNames[0] = "userWins";
     _fieldNames[1] = "userLosses";
-    _fieldNames[2] = "userCards";
-    _fieldNames[3] = "dealerCards";
-    _fieldNames[4] = "gameEnded";
+    _fieldNames[2] = "gameEnded";
+    _fieldNames[3] = "userCards";
+    _fieldNames[4] = "dealerCards";
     return ("BlackJack", _fieldNames);
   }
 
@@ -149,248 +149,12 @@ library BlackJack {
     _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((userLosses)));
   }
 
-  /** Get userCards */
-  function getUserCards(address userAddress) internal view returns (uint256[] memory userCards) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
-    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint256());
-  }
-
-  /** Get userCards (using the specified store) */
-  function getUserCards(IStore _store, address userAddress) internal view returns (uint256[] memory userCards) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
-    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint256());
-  }
-
-  /** Set userCards */
-  function setUserCards(address userAddress, uint256[] memory userCards) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    StoreSwitch.setField(_tableId, _keyTuple, 2, EncodeArray.encode((userCards)));
-  }
-
-  /** Set userCards (using the specified store) */
-  function setUserCards(IStore _store, address userAddress, uint256[] memory userCards) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    _store.setField(_tableId, _keyTuple, 2, EncodeArray.encode((userCards)));
-  }
-
-  /** Get the length of userCards */
-  function lengthUserCards(address userAddress) internal view returns (uint256) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 2, getSchema());
-    return _byteLength / 32;
-  }
-
-  /** Get the length of userCards (using the specified store) */
-  function lengthUserCards(IStore _store, address userAddress) internal view returns (uint256) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 2, getSchema());
-    return _byteLength / 32;
-  }
-
-  /** Get an item of userCards (unchecked, returns invalid data if index overflows) */
-  function getItemUserCards(address userAddress, uint256 _index) internal view returns (uint256) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 2, getSchema(), _index * 32, (_index + 1) * 32);
-    return (uint256(Bytes.slice32(_blob, 0)));
-  }
-
-  /** Get an item of userCards (using the specified store) (unchecked, returns invalid data if index overflows) */
-  function getItemUserCards(IStore _store, address userAddress, uint256 _index) internal view returns (uint256) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 2, getSchema(), _index * 32, (_index + 1) * 32);
-    return (uint256(Bytes.slice32(_blob, 0)));
-  }
-
-  /** Push an element to userCards */
-  function pushUserCards(address userAddress, uint256 _element) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    StoreSwitch.pushToField(_tableId, _keyTuple, 2, abi.encodePacked((_element)));
-  }
-
-  /** Push an element to userCards (using the specified store) */
-  function pushUserCards(IStore _store, address userAddress, uint256 _element) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    _store.pushToField(_tableId, _keyTuple, 2, abi.encodePacked((_element)));
-  }
-
-  /** Pop an element from userCards */
-  function popUserCards(address userAddress) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    StoreSwitch.popFromField(_tableId, _keyTuple, 2, 32);
-  }
-
-  /** Pop an element from userCards (using the specified store) */
-  function popUserCards(IStore _store, address userAddress) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    _store.popFromField(_tableId, _keyTuple, 2, 32);
-  }
-
-  /** Update an element of userCards at `_index` */
-  function updateUserCards(address userAddress, uint256 _index, uint256 _element) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    StoreSwitch.updateInField(_tableId, _keyTuple, 2, _index * 32, abi.encodePacked((_element)));
-  }
-
-  /** Update an element of userCards (using the specified store) at `_index` */
-  function updateUserCards(IStore _store, address userAddress, uint256 _index, uint256 _element) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    _store.updateInField(_tableId, _keyTuple, 2, _index * 32, abi.encodePacked((_element)));
-  }
-
-  /** Get dealerCards */
-  function getDealerCards(address userAddress) internal view returns (uint256[] memory dealerCards) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
-    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint256());
-  }
-
-  /** Get dealerCards (using the specified store) */
-  function getDealerCards(IStore _store, address userAddress) internal view returns (uint256[] memory dealerCards) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
-    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint256());
-  }
-
-  /** Set dealerCards */
-  function setDealerCards(address userAddress, uint256[] memory dealerCards) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    StoreSwitch.setField(_tableId, _keyTuple, 3, EncodeArray.encode((dealerCards)));
-  }
-
-  /** Set dealerCards (using the specified store) */
-  function setDealerCards(IStore _store, address userAddress, uint256[] memory dealerCards) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    _store.setField(_tableId, _keyTuple, 3, EncodeArray.encode((dealerCards)));
-  }
-
-  /** Get the length of dealerCards */
-  function lengthDealerCards(address userAddress) internal view returns (uint256) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 3, getSchema());
-    return _byteLength / 32;
-  }
-
-  /** Get the length of dealerCards (using the specified store) */
-  function lengthDealerCards(IStore _store, address userAddress) internal view returns (uint256) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 3, getSchema());
-    return _byteLength / 32;
-  }
-
-  /** Get an item of dealerCards (unchecked, returns invalid data if index overflows) */
-  function getItemDealerCards(address userAddress, uint256 _index) internal view returns (uint256) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 3, getSchema(), _index * 32, (_index + 1) * 32);
-    return (uint256(Bytes.slice32(_blob, 0)));
-  }
-
-  /** Get an item of dealerCards (using the specified store) (unchecked, returns invalid data if index overflows) */
-  function getItemDealerCards(IStore _store, address userAddress, uint256 _index) internal view returns (uint256) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 3, getSchema(), _index * 32, (_index + 1) * 32);
-    return (uint256(Bytes.slice32(_blob, 0)));
-  }
-
-  /** Push an element to dealerCards */
-  function pushDealerCards(address userAddress, uint256 _element) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    StoreSwitch.pushToField(_tableId, _keyTuple, 3, abi.encodePacked((_element)));
-  }
-
-  /** Push an element to dealerCards (using the specified store) */
-  function pushDealerCards(IStore _store, address userAddress, uint256 _element) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    _store.pushToField(_tableId, _keyTuple, 3, abi.encodePacked((_element)));
-  }
-
-  /** Pop an element from dealerCards */
-  function popDealerCards(address userAddress) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    StoreSwitch.popFromField(_tableId, _keyTuple, 3, 32);
-  }
-
-  /** Pop an element from dealerCards (using the specified store) */
-  function popDealerCards(IStore _store, address userAddress) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    _store.popFromField(_tableId, _keyTuple, 3, 32);
-  }
-
-  /** Update an element of dealerCards at `_index` */
-  function updateDealerCards(address userAddress, uint256 _index, uint256 _element) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    StoreSwitch.updateInField(_tableId, _keyTuple, 3, _index * 32, abi.encodePacked((_element)));
-  }
-
-  /** Update an element of dealerCards (using the specified store) at `_index` */
-  function updateDealerCards(IStore _store, address userAddress, uint256 _index, uint256 _element) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
-    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
-
-    _store.updateInField(_tableId, _keyTuple, 3, _index * 32, abi.encodePacked((_element)));
-  }
-
   /** Get gameEnded */
   function getGameEnded(address userAddress) internal view returns (bool gameEnded) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 4);
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
     return (_toBool(uint8(Bytes.slice1(_blob, 0))));
   }
 
@@ -399,7 +163,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    bytes memory _blob = _store.getField(_tableId, _keyTuple, 4);
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
     return (_toBool(uint8(Bytes.slice1(_blob, 0))));
   }
 
@@ -408,7 +172,7 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    StoreSwitch.setField(_tableId, _keyTuple, 4, abi.encodePacked((gameEnded)));
+    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((gameEnded)));
   }
 
   /** Set gameEnded (using the specified store) */
@@ -416,7 +180,243 @@ library BlackJack {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
 
-    _store.setField(_tableId, _keyTuple, 4, abi.encodePacked((gameEnded)));
+    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((gameEnded)));
+  }
+
+  /** Get userCards */
+  function getUserCards(address userAddress) internal view returns (uint256[] memory userCards) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
+    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint256());
+  }
+
+  /** Get userCards (using the specified store) */
+  function getUserCards(IStore _store, address userAddress) internal view returns (uint256[] memory userCards) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
+    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint256());
+  }
+
+  /** Set userCards */
+  function setUserCards(address userAddress, uint256[] memory userCards) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    StoreSwitch.setField(_tableId, _keyTuple, 3, EncodeArray.encode((userCards)));
+  }
+
+  /** Set userCards (using the specified store) */
+  function setUserCards(IStore _store, address userAddress, uint256[] memory userCards) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    _store.setField(_tableId, _keyTuple, 3, EncodeArray.encode((userCards)));
+  }
+
+  /** Get the length of userCards */
+  function lengthUserCards(address userAddress) internal view returns (uint256) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 3, getSchema());
+    return _byteLength / 32;
+  }
+
+  /** Get the length of userCards (using the specified store) */
+  function lengthUserCards(IStore _store, address userAddress) internal view returns (uint256) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 3, getSchema());
+    return _byteLength / 32;
+  }
+
+  /** Get an item of userCards (unchecked, returns invalid data if index overflows) */
+  function getItemUserCards(address userAddress, uint256 _index) internal view returns (uint256) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 3, getSchema(), _index * 32, (_index + 1) * 32);
+    return (uint256(Bytes.slice32(_blob, 0)));
+  }
+
+  /** Get an item of userCards (using the specified store) (unchecked, returns invalid data if index overflows) */
+  function getItemUserCards(IStore _store, address userAddress, uint256 _index) internal view returns (uint256) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 3, getSchema(), _index * 32, (_index + 1) * 32);
+    return (uint256(Bytes.slice32(_blob, 0)));
+  }
+
+  /** Push an element to userCards */
+  function pushUserCards(address userAddress, uint256 _element) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    StoreSwitch.pushToField(_tableId, _keyTuple, 3, abi.encodePacked((_element)));
+  }
+
+  /** Push an element to userCards (using the specified store) */
+  function pushUserCards(IStore _store, address userAddress, uint256 _element) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    _store.pushToField(_tableId, _keyTuple, 3, abi.encodePacked((_element)));
+  }
+
+  /** Pop an element from userCards */
+  function popUserCards(address userAddress) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    StoreSwitch.popFromField(_tableId, _keyTuple, 3, 32);
+  }
+
+  /** Pop an element from userCards (using the specified store) */
+  function popUserCards(IStore _store, address userAddress) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    _store.popFromField(_tableId, _keyTuple, 3, 32);
+  }
+
+  /** Update an element of userCards at `_index` */
+  function updateUserCards(address userAddress, uint256 _index, uint256 _element) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    StoreSwitch.updateInField(_tableId, _keyTuple, 3, _index * 32, abi.encodePacked((_element)));
+  }
+
+  /** Update an element of userCards (using the specified store) at `_index` */
+  function updateUserCards(IStore _store, address userAddress, uint256 _index, uint256 _element) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    _store.updateInField(_tableId, _keyTuple, 3, _index * 32, abi.encodePacked((_element)));
+  }
+
+  /** Get dealerCards */
+  function getDealerCards(address userAddress) internal view returns (uint256[] memory dealerCards) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 4);
+    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint256());
+  }
+
+  /** Get dealerCards (using the specified store) */
+  function getDealerCards(IStore _store, address userAddress) internal view returns (uint256[] memory dealerCards) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 4);
+    return (SliceLib.getSubslice(_blob, 0, _blob.length).decodeArray_uint256());
+  }
+
+  /** Set dealerCards */
+  function setDealerCards(address userAddress, uint256[] memory dealerCards) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    StoreSwitch.setField(_tableId, _keyTuple, 4, EncodeArray.encode((dealerCards)));
+  }
+
+  /** Set dealerCards (using the specified store) */
+  function setDealerCards(IStore _store, address userAddress, uint256[] memory dealerCards) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    _store.setField(_tableId, _keyTuple, 4, EncodeArray.encode((dealerCards)));
+  }
+
+  /** Get the length of dealerCards */
+  function lengthDealerCards(address userAddress) internal view returns (uint256) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    uint256 _byteLength = StoreSwitch.getFieldLength(_tableId, _keyTuple, 4, getSchema());
+    return _byteLength / 32;
+  }
+
+  /** Get the length of dealerCards (using the specified store) */
+  function lengthDealerCards(IStore _store, address userAddress) internal view returns (uint256) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    uint256 _byteLength = _store.getFieldLength(_tableId, _keyTuple, 4, getSchema());
+    return _byteLength / 32;
+  }
+
+  /** Get an item of dealerCards (unchecked, returns invalid data if index overflows) */
+  function getItemDealerCards(address userAddress, uint256 _index) internal view returns (uint256) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    bytes memory _blob = StoreSwitch.getFieldSlice(_tableId, _keyTuple, 4, getSchema(), _index * 32, (_index + 1) * 32);
+    return (uint256(Bytes.slice32(_blob, 0)));
+  }
+
+  /** Get an item of dealerCards (using the specified store) (unchecked, returns invalid data if index overflows) */
+  function getItemDealerCards(IStore _store, address userAddress, uint256 _index) internal view returns (uint256) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    bytes memory _blob = _store.getFieldSlice(_tableId, _keyTuple, 4, getSchema(), _index * 32, (_index + 1) * 32);
+    return (uint256(Bytes.slice32(_blob, 0)));
+  }
+
+  /** Push an element to dealerCards */
+  function pushDealerCards(address userAddress, uint256 _element) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    StoreSwitch.pushToField(_tableId, _keyTuple, 4, abi.encodePacked((_element)));
+  }
+
+  /** Push an element to dealerCards (using the specified store) */
+  function pushDealerCards(IStore _store, address userAddress, uint256 _element) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    _store.pushToField(_tableId, _keyTuple, 4, abi.encodePacked((_element)));
+  }
+
+  /** Pop an element from dealerCards */
+  function popDealerCards(address userAddress) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    StoreSwitch.popFromField(_tableId, _keyTuple, 4, 32);
+  }
+
+  /** Pop an element from dealerCards (using the specified store) */
+  function popDealerCards(IStore _store, address userAddress) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    _store.popFromField(_tableId, _keyTuple, 4, 32);
+  }
+
+  /** Update an element of dealerCards at `_index` */
+  function updateDealerCards(address userAddress, uint256 _index, uint256 _element) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    StoreSwitch.updateInField(_tableId, _keyTuple, 4, _index * 32, abi.encodePacked((_element)));
+  }
+
+  /** Update an element of dealerCards (using the specified store) at `_index` */
+  function updateDealerCards(IStore _store, address userAddress, uint256 _index, uint256 _element) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
+
+    _store.updateInField(_tableId, _keyTuple, 4, _index * 32, abi.encodePacked((_element)));
   }
 
   /** Get the full data */
@@ -442,11 +442,11 @@ library BlackJack {
     address userAddress,
     uint256 userWins,
     uint256 userLosses,
+    bool gameEnded,
     uint256[] memory userCards,
-    uint256[] memory dealerCards,
-    bool gameEnded
+    uint256[] memory dealerCards
   ) internal {
-    bytes memory _data = encode(userWins, userLosses, userCards, dealerCards, gameEnded);
+    bytes memory _data = encode(userWins, userLosses, gameEnded, userCards, dealerCards);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
@@ -460,11 +460,11 @@ library BlackJack {
     address userAddress,
     uint256 userWins,
     uint256 userLosses,
+    bool gameEnded,
     uint256[] memory userCards,
-    uint256[] memory dealerCards,
-    bool gameEnded
+    uint256[] memory dealerCards
   ) internal {
-    bytes memory _data = encode(userWins, userLosses, userCards, dealerCards, gameEnded);
+    bytes memory _data = encode(userWins, userLosses, gameEnded, userCards, dealerCards);
 
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(uint160((userAddress))));
@@ -474,7 +474,7 @@ library BlackJack {
 
   /** Set the full data using the data struct */
   function set(address userAddress, BlackJackData memory _table) internal {
-    set(userAddress, _table.userWins, _table.userLosses, _table.userCards, _table.dealerCards, _table.gameEnded);
+    set(userAddress, _table.userWins, _table.userLosses, _table.gameEnded, _table.userCards, _table.dealerCards);
   }
 
   /** Set the full data using the data struct (using the specified store) */
@@ -484,9 +484,9 @@ library BlackJack {
       userAddress,
       _table.userWins,
       _table.userLosses,
+      _table.gameEnded,
       _table.userCards,
-      _table.dealerCards,
-      _table.gameEnded
+      _table.dealerCards
     );
   }
 
@@ -521,9 +521,9 @@ library BlackJack {
   function encode(
     uint256 userWins,
     uint256 userLosses,
+    bool gameEnded,
     uint256[] memory userCards,
-    uint256[] memory dealerCards,
-    bool gameEnded
+    uint256[] memory dealerCards
   ) internal view returns (bytes memory) {
     uint40[] memory _counters = new uint40[](2);
     _counters[0] = uint40(userCards.length * 32);
