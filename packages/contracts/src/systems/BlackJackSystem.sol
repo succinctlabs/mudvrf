@@ -59,6 +59,15 @@ contract BlackJackSystem is System {
         uint256[] memory userCards = BlackJack.getUserCards(user);
         uint256[] memory newUserCards = new uint256[](userCards.length + 1);
         newUserCards[userCards.length] = randomWords[0] % 52;
+
+        uint256 sum = 0;
+        for (uint256 i = 0; i < newUserCards.length; i++) {
+            sum += newUserCards[i];
+        }
+        if (sum > 21) {
+            uint256 userLosses = BlackJack.getUserLosses(user);
+            BlackJack.setUserLosses(user, userLosses + 1);
+        }
         BlackJack.setUserCards(user, newUserCards);
     }
 }
