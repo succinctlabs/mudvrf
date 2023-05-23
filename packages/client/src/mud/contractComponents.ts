@@ -105,10 +105,11 @@ export function defineContractComponents(world: World) {
       return defineComponent(
         world,
         {
-          userCards: RecsType.BigIntArray,
-          dealerCards: RecsType.BigIntArray,
           userWins: RecsType.BigInt,
           userLosses: RecsType.BigInt,
+          userCards: RecsType.BigIntArray,
+          dealerCards: RecsType.BigIntArray,
+          gameEnded: RecsType.Boolean,
         },
         {
           metadata: {

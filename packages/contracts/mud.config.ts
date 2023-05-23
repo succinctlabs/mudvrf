@@ -52,10 +52,11 @@ export default mudConfig({
         userAddress: "address"
       },
       schema: {
-        userCards: "uint256[]",
-        dealerCards: "uint256[]",
         userWins: "uint256",
         userLosses: "uint256",
+        userCards: "uint256[]",
+        dealerCards: "uint256[]",
+        gameEnded: "bool"
       }
     },
     RequestIdToBlackJackUser: {
