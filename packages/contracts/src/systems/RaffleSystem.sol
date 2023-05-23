@@ -30,7 +30,11 @@ contract RaffleSystem is System {
     // End a raffle and ask for randomness.
     function endRaffle(uint32 raffleId) public {
         bytes32 requestId = IVRFSystem(_world()).requestRandomWords(
-            bytes32(0), 0, 10000000, 1, IRaffleSystem.endRaffleCallback.selector
+            bytes32(hex"c1ffd3cfee2d9e5cd67643f8f39fd6e51aad88f6f4ce6ab8827279cfffb92266"),
+            0,
+            10000000,
+            1,
+            IRaffleSystem.endRaffleCallback.selector
         );
         RequestIdToRaffleId.set(requestId, raffleId);
     }
