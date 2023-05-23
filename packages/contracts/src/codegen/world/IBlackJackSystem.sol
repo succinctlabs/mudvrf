@@ -11,4 +11,8 @@ interface IBlackJackSystem {
   function dealUser() external;
 
   function handleDealUser(bytes32 requestId, uint256[] memory randomWords) external;
+
+  function standUser() external;
+
+  function handleStandUser(bytes32 requestId, uint256[] memory randomWords) external;
 }
