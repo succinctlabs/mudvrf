@@ -33,6 +33,19 @@ export default mudConfig({
       schema: {
         raffleId: "uint32"
       }
+    },
+    VRFRequestTableV2: {
+      keySchema: {
+        requestId: "bytes32"
+      },
+      schema: { 
+        msgSender: "address",
+        nonce: "uint256",
+        blockNumber: "uint256",
+        callbackGasLimmit: "uint32",
+        nbWords: "uint32",
+        callbackSelector: "bytes4"
+      }
     }
   },
 });

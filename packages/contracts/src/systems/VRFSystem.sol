@@ -2,7 +2,7 @@
 pragma solidity >=0.8.0;
 
 import {System} from "@latticexyz/world/src/System.sol";
-import {VRFRequestTable, VRFRequestNonce} from "../codegen/Tables.sol";
+import {VRFRequestTableV2, VRFRequestNonce, VRFRequestTableV2Data} from "../codegen/Tables.sol";
 import {VRF, VRFRequest} from "./VRF.sol";
 
 contract VRFSystem is System, VRF {
@@ -28,7 +28,7 @@ contract VRFSystem is System, VRF {
         uint16 _requestConfirmations,
         uint32 _callbackGasLimit,
         uint32 _nbWords,
-        bytes4 callbackSelector
+        bytes4 _callbackSelector
     ) external returns (bytes32) {
         if (_requestConfirmations < MINIMUM_REQUEST_CONFIRMATIONS) {
             revert InvalidRequestConfirmations();
@@ -43,35 +43,38 @@ contract VRFSystem is System, VRF {
 
         bytes32 seed = keccak256(abi.encode(_msgSender(), nonce));
         bytes32 requestId = keccak256(abi.encode(_oracleId, seed));
-        bytes32 commitment =
-            keccak256(abi.encode(requestId, block.number, _callbackGasLimit, _nbWords, msg.sender, callbackSelector));
-        VRFRequestTable.set(requestId, commitment);
+        VRFRequestTableV2.set(
+            requestId,
+            _msgSender(),
+            nonce,
+            block.number,
+            _callbackGasLimit,
+            _nbWords,
+            _callbackSelector
+        );
 
-        // TODO: incorporate some pseudorandomness that is unpredictable by the user sending the tx.
-        emit RandomnessRequest(nonce, requestId, seed, _nbWords);
         return requestId;
     }
 
     function fulfillRandomWords(VRF.Proof memory _proof, VRFRequest memory _request) external {
         bytes32 oracleId = keccak256(abi.encode(_proof.pk));
-
         // TODO: check the oracleId is actually correct.
 
         bytes32 requestId = keccak256(abi.encode(oracleId, _proof.seed));
-        bytes32 commitment = VRFRequestTable.get(requestId);
-        if (commitment == bytes32(0)) {
-            revert InvalidCommitment();
-        } else if (
-            commitment
-                != keccak256(
-                    abi.encode(
-                        requestId, _request.blockNumber, _request.callbackGasLimit, _request.nbWords, _request.sender
-                    )
-                )
-        ) {
-            revert InvalidRequestParameters();
-        }
-        VRFRequestTable.deleteRecord(requestId);
+        VRFRequestTableV2Data memory request = VRFRequestTableV2.get(requestId);
+        // if (commitment == bytes32(0)) {
+        //     revert InvalidCommitment();
+        // } else if (
+        //     commitment
+        //         != keccak256(
+        //             abi.encode(
+        //                 requestId, _request.blockNumber, _request.callbackGasLimit, _request.nbWords, _request.sender
+        //             )
+        //         )
+        // ) {
+        //     revert InvalidRequestParameters();
+        // }
+        // VRFRequestTable.deleteRecord(requestId);
 
         uint256 randomness = VRF.randomValueFromVRFProof(_proof, _proof.seed);
         uint256[] memory randomWords = new uint256[](_request.nbWords);

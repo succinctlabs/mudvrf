@@ -80,5 +80,25 @@ export function defineContractComponents(world: World) {
         }
       );
     })(),
+    VRFRequestTableV2: (() => {
+      const tableId = new TableId("", "VRFRequestTableV");
+      return defineComponent(
+        world,
+        {
+          msgSender: RecsType.String,
+          nonce: RecsType.BigInt,
+          blockNumber: RecsType.BigInt,
+          callbackGasLimmit: RecsType.Number,
+          nbWords: RecsType.Number,
+          callbackSelector: RecsType.String,
+        },
+        {
+          metadata: {
+            contractId: tableId.toHexString(),
+            tableId: tableId.toString(),
+          },
+        }
+      );
+    })(),
   };
 }
