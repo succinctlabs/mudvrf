@@ -19,7 +19,7 @@ interface IVRFSystem {
     uint16 _requestConfirmations,
     uint32 _callbackGasLimit,
     uint32 _nbWords,
-    bytes4 callbackSelector
+    bytes4 _callbackSelector
   ) external returns (bytes32);
 
   function fulfillRandomWords(VRF.Proof memory _proof, VRFRequest memory _request) external;
