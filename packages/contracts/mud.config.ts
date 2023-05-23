@@ -45,8 +45,7 @@ export default mudConfig({
         callbackGasLimit: "uint32",
         nbWords: "uint32",
         callbackSelector: "bytes4"
-      },
-      ephemeral: true
+      }
     }
   },
 });
