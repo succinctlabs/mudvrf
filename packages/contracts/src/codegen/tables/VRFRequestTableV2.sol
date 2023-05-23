@@ -84,8 +84,230 @@ library VRFRequestTableV2 {
     _store.setMetadata(_tableId, _tableName, _fieldNames);
   }
 
-  /** Emit the ephemeral event using individual values */
-  function emitEphemeral(
+  /** Get msgSender */
+  function getMsgSender(bytes32 requestId) internal view returns (address msgSender) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 0);
+    return (address(Bytes.slice20(_blob, 0)));
+  }
+
+  /** Get msgSender (using the specified store) */
+  function getMsgSender(IStore _store, bytes32 requestId) internal view returns (address msgSender) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 0);
+    return (address(Bytes.slice20(_blob, 0)));
+  }
+
+  /** Set msgSender */
+  function setMsgSender(bytes32 requestId, address msgSender) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    StoreSwitch.setField(_tableId, _keyTuple, 0, abi.encodePacked((msgSender)));
+  }
+
+  /** Set msgSender (using the specified store) */
+  function setMsgSender(IStore _store, bytes32 requestId, address msgSender) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    _store.setField(_tableId, _keyTuple, 0, abi.encodePacked((msgSender)));
+  }
+
+  /** Get nonce */
+  function getNonce(bytes32 requestId) internal view returns (uint256 nonce) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 1);
+    return (uint256(Bytes.slice32(_blob, 0)));
+  }
+
+  /** Get nonce (using the specified store) */
+  function getNonce(IStore _store, bytes32 requestId) internal view returns (uint256 nonce) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 1);
+    return (uint256(Bytes.slice32(_blob, 0)));
+  }
+
+  /** Set nonce */
+  function setNonce(bytes32 requestId, uint256 nonce) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    StoreSwitch.setField(_tableId, _keyTuple, 1, abi.encodePacked((nonce)));
+  }
+
+  /** Set nonce (using the specified store) */
+  function setNonce(IStore _store, bytes32 requestId, uint256 nonce) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    _store.setField(_tableId, _keyTuple, 1, abi.encodePacked((nonce)));
+  }
+
+  /** Get blockNumber */
+  function getBlockNumber(bytes32 requestId) internal view returns (uint256 blockNumber) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 2);
+    return (uint256(Bytes.slice32(_blob, 0)));
+  }
+
+  /** Get blockNumber (using the specified store) */
+  function getBlockNumber(IStore _store, bytes32 requestId) internal view returns (uint256 blockNumber) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 2);
+    return (uint256(Bytes.slice32(_blob, 0)));
+  }
+
+  /** Set blockNumber */
+  function setBlockNumber(bytes32 requestId, uint256 blockNumber) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    StoreSwitch.setField(_tableId, _keyTuple, 2, abi.encodePacked((blockNumber)));
+  }
+
+  /** Set blockNumber (using the specified store) */
+  function setBlockNumber(IStore _store, bytes32 requestId, uint256 blockNumber) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    _store.setField(_tableId, _keyTuple, 2, abi.encodePacked((blockNumber)));
+  }
+
+  /** Get callbackGasLimit */
+  function getCallbackGasLimit(bytes32 requestId) internal view returns (uint32 callbackGasLimit) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 3);
+    return (uint32(Bytes.slice4(_blob, 0)));
+  }
+
+  /** Get callbackGasLimit (using the specified store) */
+  function getCallbackGasLimit(IStore _store, bytes32 requestId) internal view returns (uint32 callbackGasLimit) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 3);
+    return (uint32(Bytes.slice4(_blob, 0)));
+  }
+
+  /** Set callbackGasLimit */
+  function setCallbackGasLimit(bytes32 requestId, uint32 callbackGasLimit) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    StoreSwitch.setField(_tableId, _keyTuple, 3, abi.encodePacked((callbackGasLimit)));
+  }
+
+  /** Set callbackGasLimit (using the specified store) */
+  function setCallbackGasLimit(IStore _store, bytes32 requestId, uint32 callbackGasLimit) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    _store.setField(_tableId, _keyTuple, 3, abi.encodePacked((callbackGasLimit)));
+  }
+
+  /** Get nbWords */
+  function getNbWords(bytes32 requestId) internal view returns (uint32 nbWords) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 4);
+    return (uint32(Bytes.slice4(_blob, 0)));
+  }
+
+  /** Get nbWords (using the specified store) */
+  function getNbWords(IStore _store, bytes32 requestId) internal view returns (uint32 nbWords) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 4);
+    return (uint32(Bytes.slice4(_blob, 0)));
+  }
+
+  /** Set nbWords */
+  function setNbWords(bytes32 requestId, uint32 nbWords) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    StoreSwitch.setField(_tableId, _keyTuple, 4, abi.encodePacked((nbWords)));
+  }
+
+  /** Set nbWords (using the specified store) */
+  function setNbWords(IStore _store, bytes32 requestId, uint32 nbWords) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    _store.setField(_tableId, _keyTuple, 4, abi.encodePacked((nbWords)));
+  }
+
+  /** Get callbackSelector */
+  function getCallbackSelector(bytes32 requestId) internal view returns (bytes4 callbackSelector) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    bytes memory _blob = StoreSwitch.getField(_tableId, _keyTuple, 5);
+    return (Bytes.slice4(_blob, 0));
+  }
+
+  /** Get callbackSelector (using the specified store) */
+  function getCallbackSelector(IStore _store, bytes32 requestId) internal view returns (bytes4 callbackSelector) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    bytes memory _blob = _store.getField(_tableId, _keyTuple, 5);
+    return (Bytes.slice4(_blob, 0));
+  }
+
+  /** Set callbackSelector */
+  function setCallbackSelector(bytes32 requestId, bytes4 callbackSelector) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    StoreSwitch.setField(_tableId, _keyTuple, 5, abi.encodePacked((callbackSelector)));
+  }
+
+  /** Set callbackSelector (using the specified store) */
+  function setCallbackSelector(IStore _store, bytes32 requestId, bytes4 callbackSelector) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    _store.setField(_tableId, _keyTuple, 5, abi.encodePacked((callbackSelector)));
+  }
+
+  /** Get the full data */
+  function get(bytes32 requestId) internal view returns (VRFRequestTableV2Data memory _table) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    bytes memory _blob = StoreSwitch.getRecord(_tableId, _keyTuple, getSchema());
+    return decode(_blob);
+  }
+
+  /** Get the full data (using the specified store) */
+  function get(IStore _store, bytes32 requestId) internal view returns (VRFRequestTableV2Data memory _table) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    bytes memory _blob = _store.getRecord(_tableId, _keyTuple, getSchema());
+    return decode(_blob);
+  }
+
+  /** Set the full data using individual values */
+  function set(
     bytes32 requestId,
     address msgSender,
     uint256 nonce,
@@ -99,11 +321,11 @@ library VRFRequestTableV2 {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((requestId));
 
-    StoreSwitch.emitEphemeralRecord(_tableId, _keyTuple, _data);
+    StoreSwitch.setRecord(_tableId, _keyTuple, _data);
   }
 
-  /** Emit the ephemeral event using individual values (using the specified store) */
-  function emitEphemeral(
+  /** Set the full data using individual values (using the specified store) */
+  function set(
     IStore _store,
     bytes32 requestId,
     address msgSender,
@@ -118,12 +340,12 @@ library VRFRequestTableV2 {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((requestId));
 
-    _store.emitEphemeralRecord(_tableId, _keyTuple, _data);
+    _store.setRecord(_tableId, _keyTuple, _data);
   }
 
-  /** Emit the ephemeral event using the data struct */
-  function emitEphemeral(bytes32 requestId, VRFRequestTableV2Data memory _table) internal {
-    emitEphemeral(
+  /** Set the full data using the data struct */
+  function set(bytes32 requestId, VRFRequestTableV2Data memory _table) internal {
+    set(
       requestId,
       _table.msgSender,
       _table.nonce,
@@ -134,9 +356,9 @@ library VRFRequestTableV2 {
     );
   }
 
-  /** Emit the ephemeral event using the data struct (using the specified store) */
-  function emitEphemeral(IStore _store, bytes32 requestId, VRFRequestTableV2Data memory _table) internal {
-    emitEphemeral(
+  /** Set the full data using the data struct (using the specified store) */
+  function set(IStore _store, bytes32 requestId, VRFRequestTableV2Data memory _table) internal {
+    set(
       _store,
       requestId,
       _table.msgSender,
@@ -146,6 +368,21 @@ library VRFRequestTableV2 {
       _table.nbWords,
       _table.callbackSelector
     );
+  }
+
+  /** Decode the tightly packed blob using this table's schema */
+  function decode(bytes memory _blob) internal pure returns (VRFRequestTableV2Data memory _table) {
+    _table.msgSender = (address(Bytes.slice20(_blob, 0)));
+
+    _table.nonce = (uint256(Bytes.slice32(_blob, 20)));
+
+    _table.blockNumber = (uint256(Bytes.slice32(_blob, 52)));
+
+    _table.callbackGasLimit = (uint32(Bytes.slice4(_blob, 84)));
+
+    _table.nbWords = (uint32(Bytes.slice4(_blob, 88)));
+
+    _table.callbackSelector = (Bytes.slice4(_blob, 92));
   }
 
   /** Tightly pack full data using this table's schema */
@@ -164,5 +401,21 @@ library VRFRequestTableV2 {
   function encodeKeyTuple(bytes32 requestId) internal pure returns (bytes32[] memory _keyTuple) {
     _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((requestId));
+  }
+
+  /* Delete all data for given keys */
+  function deleteRecord(bytes32 requestId) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    StoreSwitch.deleteRecord(_tableId, _keyTuple);
+  }
+
+  /* Delete all data for given keys (using the specified store) */
+  function deleteRecord(IStore _store, bytes32 requestId) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32((requestId));
+
+    _store.deleteRecord(_tableId, _keyTuple);
   }
 }

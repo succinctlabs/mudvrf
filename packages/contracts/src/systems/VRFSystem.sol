@@ -73,19 +73,7 @@ contract VRFSystem is System, VRF {
         } else if (request.callbackSelector != _request.callbackSelector) {
             revert InvalidRequestParameters();
         }
-        // if (commitment == bytes32(0)) {
-        //     revert InvalidCommitment();
-        // } else if (
-        //     commitment
-        //         != keccak256(
-        //             abi.encode(
-        //                 requestId, _request.blockNumber, _request.callbackGasLimit, _request.nbWords, _request.sender
-        //             )
-        //         )
-        // ) {
-        //     revert InvalidRequestParameters();
-        // }
-        // VRFRequestTable.deleteRecord(requestId);
+        VRFRequestTableV2.deleteRecord(requestId);
 
         uint256 randomness = VRF.randomValueFromVRFProof(_proof, _proof.seed);
         uint256[] memory randomWords = new uint256[](_request.nbWords);
