@@ -42,10 +42,11 @@ export default mudConfig({
         msgSender: "address",
         nonce: "uint256",
         blockNumber: "uint256",
-        callbackGasLimmit: "uint32",
+        callbackGasLimit: "uint32",
         nbWords: "uint32",
         callbackSelector: "bytes4"
-      }
+      },
+      ephemeral: true
     }
   },
 });

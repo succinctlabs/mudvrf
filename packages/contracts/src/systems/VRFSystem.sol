@@ -62,6 +62,17 @@ contract VRFSystem is System, VRF {
 
         bytes32 requestId = keccak256(abi.encode(oracleId, _proof.seed));
         VRFRequestTableV2Data memory request = VRFRequestTableV2.get(requestId);
+        if (request.msgSender == address(0)) {
+            revert InvalidRequestParameters();
+        } else if (request.blockNumber != _request.blockNumber) {
+            revert InvalidRequestParameters();
+        } else if (request.callbackGasLimit != _request.callbackGasLimit) {
+            revert InvalidRequestParameters();
+        } else if (request.nbWords != _request.nbWords) {
+            revert InvalidRequestParameters();
+        } else if (request.callbackSelector != _request.callbackSelector) {
+            revert InvalidRequestParameters();
+        }
         // if (commitment == bytes32(0)) {
         //     revert InvalidCommitment();
         // } else if (

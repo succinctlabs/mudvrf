@@ -88,7 +88,7 @@ export function defineContractComponents(world: World) {
           msgSender: RecsType.String,
           nonce: RecsType.BigInt,
           blockNumber: RecsType.BigInt,
-          callbackGasLimmit: RecsType.Number,
+          callbackGasLimit: RecsType.Number,
           nbWords: RecsType.Number,
           callbackSelector: RecsType.String,
         },
