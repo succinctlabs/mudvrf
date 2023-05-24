@@ -24,7 +24,8 @@ type VRFServer struct {
 }
 
 // bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("VRFRequestTableV")));
-var TABLE_ID = common.Hex2Bytes("00000000000000000000000000000000565246526571756573745461626c6556")
+// var TABLE_ID = common.Hex2Bytes("00000000000000000000000000000000565246526571756573745461626c6556")
+var TABLE_ID = common.Hex2Bytes("0000000000000000000000000000000056524652657175657374730000000000")
 
 // abigen --abi ../../solidity/contracts/VRFConsumer.abi --pkg bindings --type VRFSystem --out ../bindings/VRFSystem.go --bin ..
 func New(privateKey string, contractAddress common.Address, ethclient *ethclient.Client) *VRFServer {

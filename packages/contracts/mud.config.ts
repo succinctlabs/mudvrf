@@ -44,4 +44,11 @@ export default mudConfig({
       schema: "uint256", 
     }
   },
+  modules: [
+    {
+      name: "VRFCoordinator",
+      root: true,
+      args: [],
+    },
+  ],
 });
