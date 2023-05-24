@@ -1,19 +1,30 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import {System} from "@latticexyz/world/src/System.sol";
-import {VRFRequestTableV2, VRFRequestNonce, VRFRequestTableV2Data} from "../codegen/Tables.sol";
-import {VRF, VRFRequest} from "./VRF.sol";
+import { System } from "@latticexyz/world/src/System.sol";
 
-contract VRFSystem is System, VRF {
+import { VRF } from "./VRF.sol";
+import { VRFRequest } from "./Types.sol";
+import { VRFRequests, VRFRequestsData } from "./tables/VRFRequests.sol";
+import { VRFNonce } from "./tables/VRFNonce.sol";
+
+/// @title VRFCoordinatorSystem
+/// @notice This contract handles requests and fulfillments of random words from a VRF.
+contract VRFCoordinatorSystem is System, VRF {
+    /// @notice The oracle identifier used for validating the VRF proof came from the oracle.
     bytes32 public constant ORACLE_ID = 0xc0a6c424ac7157ae408398df7e5f4552091a69125d5dfcb7b8c2659029395bdf;
-    address public constant ORACLE_ADDRESS = 0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf;
-    uint16 public constant MINIMUM_REQUEST_CONFIRMATIONS = 0;
-    uint64 public constant MAXIMUM_CALLBACK_GAS_LIMIT = 10000000;
-    uint64 public constant MAXIMUM_NB_WORDS = 64;
 
-    event RandomnessRequest(uint256 indexed nonce, bytes32 indexed requestId, bytes32 seed, uint64 nbWords);
-    event FulfilledRandomness(bytes32 indexed requestId, uint256[] words);
+    /// @notice The oracle address used for validating that the VRF proof came from the oracle.
+    address public constant ORACLE_ADDRESS = 0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf;
+
+    /// @notice The minimum number of request confirmatins.
+    uint16 public constant MINIMUM_REQUEST_CONFIRMATIONS = 0;
+
+    /// @notice The maximum callback gas limit.
+    uint64 public constant MAXIMUM_CALLBACK_GAS_LIMIT = 10000000;
+
+    /// @notice The maximum number of random words that can be provided in the callback.
+    uint64 public constant MAXIMUM_NB_WORDS = 64;
 
     error InvalidRequestConfirmations();
     error InvalidCallbackGasLimit();
@@ -23,6 +34,12 @@ contract VRFSystem is System, VRF {
     error InvalidRequestParameters();
     error FailedToFulfillRandomness();
 
+    /// @notice Requests random words from the VRF.
+    /// @param _oracleId The address of the operator to get shares for.
+    /// @param _requestConfirmations The number of shares for the operator.
+    /// @param _callbackGasLimit The maximum amount of gas the callback can use.
+    /// @param _nbWords The number of random words to request.
+    /// @param _callbackSelector The selector of the callback function.
     function requestRandomWords(
         bytes32 _oracleId,
         uint16 _requestConfirmations,
@@ -38,24 +55,27 @@ contract VRFSystem is System, VRF {
             revert InvalidNumberOfWords();
         }
 
-        uint256 nonce = VRFRequestNonce.get();
-        VRFRequestNonce.set(nonce + 1);
+        uint256 nonce = VRFNonce.get();
+        VRFNonce.set(nonce + 1);
 
         bytes32 seed = keccak256(abi.encode(_msgSender(), nonce));
         bytes32 requestId = keccak256(abi.encode(_oracleId, seed));
-        VRFRequestTableV2.set(
+        VRFRequests.set(
             requestId, _msgSender(), nonce, block.number, _callbackGasLimit, _nbWords, _callbackSelector
         );
 
         return requestId;
     }
 
+    /// @notice Fulfills the request for random words.
+    /// @param _proof The address of the operator to get shares for.
+    /// @param _request The number of shares for the operator.
     function fulfillRandomWords(VRF.Proof memory _proof, VRFRequest memory _request) external {
         bytes32 oracleId = keccak256(abi.encode(_proof.pk));
         // TODO: check the oracleId is actually correct.
 
         bytes32 requestId = keccak256(abi.encode(oracleId, _proof.seed));
-        VRFRequestTableV2Data memory request = VRFRequestTableV2.get(requestId);
+        VRFRequestsData memory request = VRFRequests.get(requestId);
         if (request.msgSender == address(0)) {
             revert InvalidRequestParameters();
         } else if (request.blockNumber != _request.blockNumber) {
@@ -67,7 +87,7 @@ contract VRFSystem is System, VRF {
         } else if (request.callbackSelector != _request.callbackSelector) {
             revert InvalidRequestParameters();
         }
-        VRFRequestTableV2.deleteRecord(requestId);
+        VRFRequests.deleteRecord(requestId);
 
         uint256 randomness = VRF.randomValueFromVRFProof(_proof, _proof.seed);
         uint256[] memory randomWords = new uint256[](_request.nbWords);
@@ -81,7 +101,5 @@ contract VRFSystem is System, VRF {
         if (!status) {
             revert FailedToFulfillRandomness();
         }
-
-        emit FulfilledRandomness(requestId, randomWords);
     }
 }

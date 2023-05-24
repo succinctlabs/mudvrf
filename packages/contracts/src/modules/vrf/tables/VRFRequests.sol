@@ -17,10 +17,10 @@ import { EncodeArray } from "@latticexyz/store/src/tightcoder/EncodeArray.sol";
 import { Schema, SchemaLib } from "@latticexyz/store/src/Schema.sol";
 import { PackedCounter, PackedCounterLib } from "@latticexyz/store/src/PackedCounter.sol";
 
-bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("VRFRequestTableV")));
-bytes32 constant VRFRequestTableV2TableId = _tableId;
+bytes32 constant _tableId = bytes32(abi.encodePacked(bytes16(""), bytes16("VRFRequests")));
+bytes32 constant VRFRequestsTableId = _tableId;
 
-struct VRFRequestTableV2Data {
+struct VRFRequestsData {
   address msgSender;
   uint256 nonce;
   uint256 blockNumber;
@@ -29,7 +29,7 @@ struct VRFRequestTableV2Data {
   bytes4 callbackSelector;
 }
 
-library VRFRequestTableV2 {
+library VRFRequests {
   /** Get the table's schema */
   function getSchema() internal pure returns (Schema) {
     SchemaType[] memory _schema = new SchemaType[](6);
@@ -59,7 +59,7 @@ library VRFRequestTableV2 {
     _fieldNames[3] = "callbackGasLimit";
     _fieldNames[4] = "nbWords";
     _fieldNames[5] = "callbackSelector";
-    return ("VRFRequestTableV2", _fieldNames);
+    return ("VRFRequests", _fieldNames);
   }
 
   /** Register the table's schema */
@@ -289,7 +289,7 @@ library VRFRequestTableV2 {
   }
 
   /** Get the full data */
-  function get(bytes32 requestId) internal view returns (VRFRequestTableV2Data memory _table) {
+  function get(bytes32 requestId) internal view returns (VRFRequestsData memory _table) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((requestId));
 
@@ -298,7 +298,7 @@ library VRFRequestTableV2 {
   }
 
   /** Get the full data (using the specified store) */
-  function get(IStore _store, bytes32 requestId) internal view returns (VRFRequestTableV2Data memory _table) {
+  function get(IStore _store, bytes32 requestId) internal view returns (VRFRequestsData memory _table) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32((requestId));
 
@@ -344,7 +344,7 @@ library VRFRequestTableV2 {
   }
 
   /** Set the full data using the data struct */
-  function set(bytes32 requestId, VRFRequestTableV2Data memory _table) internal {
+  function set(bytes32 requestId, VRFRequestsData memory _table) internal {
     set(
       requestId,
       _table.msgSender,
@@ -357,7 +357,7 @@ library VRFRequestTableV2 {
   }
 
   /** Set the full data using the data struct (using the specified store) */
-  function set(IStore _store, bytes32 requestId, VRFRequestTableV2Data memory _table) internal {
+  function set(IStore _store, bytes32 requestId, VRFRequestsData memory _table) internal {
     set(
       _store,
       requestId,
@@ -371,7 +371,7 @@ library VRFRequestTableV2 {
   }
 
   /** Decode the tightly packed blob using this table's schema */
-  function decode(bytes memory _blob) internal pure returns (VRFRequestTableV2Data memory _table) {
+  function decode(bytes memory _blob) internal pure returns (VRFRequestsData memory _table) {
     _table.msgSender = (address(Bytes.slice20(_blob, 0)));
 
     _table.nonce = (uint256(Bytes.slice32(_blob, 20)));

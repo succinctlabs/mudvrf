@@ -5,14 +5,13 @@ pragma solidity >=0.8.0;
 
 import { IBaseWorld } from "@latticexyz/world/src/interfaces/IBaseWorld.sol";
 
+import { IVRFCoordinatorSystem } from "./IVRFCoordinatorSystem.sol";
 import { IBlackJackSystem } from "./IBlackJackSystem.sol";
-import { IRaffleSystem } from "./IRaffleSystem.sol";
-import { IVRFSystem } from "./IVRFSystem.sol";
 
 /**
  * The IWorld interface includes all systems dynamically added to the World
  * during the deploy process.
  */
-interface IWorld is IBaseWorld, IBlackJackSystem, IRaffleSystem, IVRFSystem {
+interface IWorld is IBaseWorld, IVRFCoordinatorSystem, IBlackJackSystem {
 
 }

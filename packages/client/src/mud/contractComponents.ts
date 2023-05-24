@@ -5,101 +5,6 @@ import { defineComponent, Type as RecsType, World } from "@latticexyz/recs";
 
 export function defineContractComponents(world: World) {
   return {
-    RaffleCounter: (() => {
-      const tableId = new TableId("", "RaffleCounter");
-      return defineComponent(
-        world,
-        {
-          value: RecsType.Number,
-        },
-        {
-          metadata: {
-            contractId: tableId.toHexString(),
-            tableId: tableId.toString(),
-          },
-        }
-      );
-    })(),
-    RaffleTable: (() => {
-      const tableId = new TableId("", "RaffleTable");
-      return defineComponent(
-        world,
-        {
-          tickets: RecsType.StringArray,
-        },
-        {
-          metadata: {
-            contractId: tableId.toHexString(),
-            tableId: tableId.toString(),
-          },
-        }
-      );
-    })(),
-    VRFRequestNonce: (() => {
-      const tableId = new TableId("", "VRFRequestNonce");
-      return defineComponent(
-        world,
-        {
-          value: RecsType.BigInt,
-        },
-        {
-          metadata: {
-            contractId: tableId.toHexString(),
-            tableId: tableId.toString(),
-          },
-        }
-      );
-    })(),
-    VRFRequestTable: (() => {
-      const tableId = new TableId("", "VRFRequestTable");
-      return defineComponent(
-        world,
-        {
-          commitment: RecsType.String,
-        },
-        {
-          metadata: {
-            contractId: tableId.toHexString(),
-            tableId: tableId.toString(),
-          },
-        }
-      );
-    })(),
-    RequestIdToRaffleId: (() => {
-      const tableId = new TableId("", "RequestIdToRaffl");
-      return defineComponent(
-        world,
-        {
-          raffleId: RecsType.Number,
-        },
-        {
-          metadata: {
-            contractId: tableId.toHexString(),
-            tableId: tableId.toString(),
-          },
-        }
-      );
-    })(),
-    VRFRequestTableV2: (() => {
-      const tableId = new TableId("", "VRFRequestTableV");
-      return defineComponent(
-        world,
-        {
-          msgSender: RecsType.String,
-          nonce: RecsType.BigInt,
-          blockNumber: RecsType.BigInt,
-          callbackGasLimit: RecsType.Number,
-          nbWords: RecsType.Number,
-          callbackSelector: RecsType.String,
-        },
-        {
-          metadata: {
-            contractId: tableId.toHexString(),
-            tableId: tableId.toString(),
-          },
-        }
-      );
-    })(),
     BlackJack: (() => {
       const tableId = new TableId("", "BlackJack");
       return defineComponent(
@@ -126,6 +31,41 @@ export function defineContractComponents(world: World) {
         world,
         {
           user: RecsType.String,
+        },
+        {
+          metadata: {
+            contractId: tableId.toHexString(),
+            tableId: tableId.toString(),
+          },
+        }
+      );
+    })(),
+    VRFRequests: (() => {
+      const tableId = new TableId("", "VRFRequests");
+      return defineComponent(
+        world,
+        {
+          msgSender: RecsType.String,
+          nonce: RecsType.BigInt,
+          blockNumber: RecsType.BigInt,
+          callbackGasLimit: RecsType.Number,
+          nbWords: RecsType.Number,
+          callbackSelector: RecsType.String,
+        },
+        {
+          metadata: {
+            contractId: tableId.toHexString(),
+            tableId: tableId.toString(),
+          },
+        }
+      );
+    })(),
+    VRFNonce: (() => {
+      const tableId = new TableId("", "VRFNonce");
+      return defineComponent(
+        world,
+        {
+          value: RecsType.BigInt,
         },
         {
           metadata: {
