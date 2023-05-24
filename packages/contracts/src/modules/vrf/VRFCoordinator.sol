@@ -128,7 +128,11 @@ contract VRFCoordinator is VRF {
         }
         delete requests[requestId];
 
-        uint256 randomness = VRF.randomValueFromVRFProof(_proof, _proof.seed);
+        // TODO: Get real block hash!
+        bytes32 blockHash = bytes32(0);
+        uint256 actualSeed = uint256(keccak256(abi.encodePacked(_proof.seed, blockHash)));
+
+        uint256 randomness = VRF.randomValueFromVRFProof(_proof, actualSeed);
         uint256[] memory randomWords = new uint256[](_request.nbWords);
         for (uint256 i = 0; i < _request.nbWords; i++) {
             randomWords[i] = uint256(keccak256(abi.encode(randomness, i)));

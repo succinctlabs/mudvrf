@@ -24,25 +24,6 @@ export default mudConfig({
         user: "address"
       }
     },
-    VRFRequests: {
-      directory: "modules/vrf/tables",
-      keySchema: {
-        requestId: "bytes32"
-      },
-      schema: { 
-        msgSender: "address",
-        nonce: "uint256",
-        blockNumber: "uint256",
-        callbackGasLimit: "uint32",
-        nbWords: "uint32",
-        callbackSelector: "bytes4"
-      }
-    },
-    VRFNonce: {
-      directory: "modules/vrf/tables",
-      keySchema: {},
-      schema: "uint256", 
-    }
   },
   modules: [
     {

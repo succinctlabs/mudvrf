@@ -40,40 +40,5 @@ export function defineContractComponents(world: World) {
         }
       );
     })(),
-    VRFRequests: (() => {
-      const tableId = new TableId("", "VRFRequests");
-      return defineComponent(
-        world,
-        {
-          msgSender: RecsType.String,
-          nonce: RecsType.BigInt,
-          blockNumber: RecsType.BigInt,
-          callbackGasLimit: RecsType.Number,
-          nbWords: RecsType.Number,
-          callbackSelector: RecsType.String,
-        },
-        {
-          metadata: {
-            contractId: tableId.toHexString(),
-            tableId: tableId.toString(),
-          },
-        }
-      );
-    })(),
-    VRFNonce: (() => {
-      const tableId = new TableId("", "VRFNonce");
-      return defineComponent(
-        world,
-        {
-          value: RecsType.BigInt,
-        },
-        {
-          metadata: {
-            contractId: tableId.toHexString(),
-            tableId: tableId.toString(),
-          },
-        }
-      );
-    })(),
   };
 }
