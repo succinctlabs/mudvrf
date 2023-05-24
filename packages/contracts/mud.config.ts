@@ -46,7 +46,7 @@ export default mudConfig({
   },
   modules: [
     {
-      name: "VRFCoordinator",
+      name: "VRFCoordinatorModule",
       root: true,
       args: [],
     },

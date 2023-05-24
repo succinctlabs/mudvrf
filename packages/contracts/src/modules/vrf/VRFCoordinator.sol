@@ -1,36 +1,146 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import { IBaseWorld } from "@latticexyz/world/src/interfaces/IBaseWorld.sol";
-import { IModule } from "@latticexyz/world/src/interfaces/IModule.sol";
-import { WorldContext } from "@latticexyz/world/src/WorldContext.sol";
+import {System} from "@latticexyz/world/src/System.sol";
 
-import { VRFRequests } from "./tables/VRFRequests.sol";
-import { VRFCoordinatorSystem } from "./VRFCoordinatorSystem.sol";
-import { NAMESPACE, MODULE_NAME, SYSTEM_NAME, TABLE_NAME } from "./constants.sol";
+import {VRF} from "./VRF.sol";
 
-contract VRFCoordinator is IModule, WorldContext {
-  VRFCoordinatorSystem public immutable vrfCoordinator = new VRFCoordinatorSystem();
+/// @title VRFCoordinator
+/// @notice This contract handles requests and fulfillments of random words from a VRF.
+contract VRFCoordinator is VRF {
+    /// @notice The oracle identifier used for validating the VRF proof came from the oracle.
+    bytes32 public constant ORACLE_ID = 0xc0a6c424ac7157ae408398df7e5f4552091a69125d5dfcb7b8c2659029395bdf;
 
-  function getName() public pure returns (bytes16) {
-    return MODULE_NAME;
-  }
+    /// @notice The oracle address used for validating that the VRF proof came from the oracle.
+    address public constant ORACLE_ADDRESS = 0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf;
 
-  function install(bytes memory) public {
-    IBaseWorld world = IBaseWorld(_world());
+    /// @notice The minimum number of request confirmatins.
+    uint16 public constant MINIMUM_REQUEST_CONFIRMATIONS = 0;
 
-    // Register table
-    world.registerTable(NAMESPACE, TABLE_NAME, VRFRequests.getSchema(), VRFRequests.getKeySchema());
+    /// @notice The maximum callback gas limit.
+    uint64 public constant MAXIMUM_CALLBACK_GAS_LIMIT = 10000000;
 
-    // Set table's metadata
-    (string memory tableName, string[] memory fieldNames) = VRFRequests.getMetadata();
-    world.setMetadata(NAMESPACE, TABLE_NAME, tableName, fieldNames);
+    /// @notice The maximum number of random words that can be provided in the callback.
+    uint64 public constant MAXIMUM_NB_WORDS = 64;
 
-    // Register system
-    world.registerSystem(NAMESPACE, SYSTEM_NAME, vrfCoordinator, true);
+    /// @notice The request nonce.
+    uint256 public nonce = 0;
 
-    // Register system's functions
-    world.registerFunctionSelector(NAMESPACE, SYSTEM_NAME, "requestRandomWords", "(bytes32,uint16,uint32,uint32,bytes4)");
-    world.registerFunctionSelector(NAMESPACE, SYSTEM_NAME, "fulfillRandomWords", "((uint256[2],uint256[2],uint256,uint256,uint256,address,uint256[2],uint256[2],uint256),(uint64,uint32,uint32,address,bytes4))");
-  }
+    /// @notice The mapping of request ids to commitments to what is stored in the request.
+    mapping(bytes32 => bytes32) public requests;
+
+    /// @notice The mapping of oracle ids to oracle addresses.
+    mapping(bytes32 => address) public oracles;
+
+    struct VRFRequest {
+        address sender;
+        uint64 blockNumber;
+        bytes32 oracleId;
+        uint16 requestConfirmations;
+        uint32 callbackGasLimit;
+        uint32 nbWords;
+        bytes4 callbackSelector;
+    }
+
+    event RandomnessRequest(uint256 indexed nonce, bytes32 indexed requestId, bytes32 seed, uint64 nbWords);
+    event FulfilledRandomness(uint256 indexed nonce, bytes32 indexed requestId, uint256[] words);
+
+    error InvalidRequestConfirmations();
+    error InvalidCallbackGasLimit();
+    error InvalidNumberOfWords();
+    error InvalidOracleId();
+    error InvalidCommitment();
+    error InvalidRequestParameters();
+    error FailedToFulfillRandomness();
+
+    constructor() {
+        oracles[ORACLE_ID] = ORACLE_ADDRESS;
+    }
+
+    /// @notice Requests random words from the VRF.
+    /// @param _oracleId The address of the operator to get shares for.
+    /// @param _requestConfirmations The number of shares for the operator.
+    /// @param _callbackGasLimit The maximum amount of gas the callback can use.
+    /// @param _nbWords The number of random words to request.
+    /// @param _callbackSelector The selector of the callback function.
+    function requestRandomWords(
+        bytes32 _oracleId,
+        uint16 _requestConfirmations,
+        uint32 _callbackGasLimit,
+        uint32 _nbWords,
+        bytes4 _callbackSelector
+    ) external returns (bytes32) {
+        if (_requestConfirmations < MINIMUM_REQUEST_CONFIRMATIONS) {
+            revert InvalidRequestConfirmations();
+        } else if (_callbackGasLimit > MAXIMUM_CALLBACK_GAS_LIMIT) {
+            revert InvalidCallbackGasLimit();
+        } else if (_nbWords > MAXIMUM_NB_WORDS) {
+            revert InvalidNumberOfWords();
+        }
+
+        bytes32 seed = keccak256(abi.encode(msg.sender, nonce));
+        bytes32 requestId = keccak256(abi.encode(_oracleId, seed));
+        requests[requestId] = keccak256(
+            abi.encode(
+                requestId,
+                msg.sender,
+                block.number,
+                _oracleId,
+                _requestConfirmations,
+                _callbackGasLimit,
+                _nbWords,
+                _callbackSelector
+            )
+        );
+        nonce += 1;
+
+        return requestId;
+    }
+
+    /// @notice Fulfills the request for random words.
+    /// @param _proof The address of the operator to get shares for.
+    /// @param _request The number of shares for the operator.
+    function fulfillRandomWords(VRF.Proof memory _proof, VRFRequest memory _request) external {
+        bytes32 oracleId = keccak256(abi.encode(_proof.pk));
+        address oracle = oracles[oracleId];
+        if (oracle == address(0)) {
+            revert InvalidOracleId();
+        }
+
+        bytes32 requestId = keccak256(abi.encode(oracleId, _proof.seed));
+        bytes32 commitment = requests[requestId];
+        bytes32 expectedCommitment = keccak256(
+            abi.encode(
+                requestId,
+                _request.sender,
+                _request.blockNumber,
+                _request.oracleId,
+                _request.requestConfirmations,
+                _request.callbackGasLimit,
+                _request.nbWords,
+                _request.callbackSelector
+            )
+        );
+        if (commitment == bytes32(0)) {
+            revert InvalidCommitment();
+        } else if (commitment != expectedCommitment) {
+            revert InvalidCommitment();
+        }
+        delete requests[requestId];
+
+        uint256 randomness = VRF.randomValueFromVRFProof(_proof, _proof.seed);
+        uint256[] memory randomWords = new uint256[](_request.nbWords);
+        for (uint256 i = 0; i < _request.nbWords; i++) {
+            randomWords[i] = uint256(keccak256(abi.encode(randomness, i)));
+        }
+
+        bytes memory fulfillRandomnessCall = abi.encodeWithSelector(_request.callbackSelector, requestId, randomWords);
+        (bool status,) = _request.sender.call(fulfillRandomnessCall);
+
+        if (!status) {
+            revert FailedToFulfillRandomness();
+        }
+
+        emit FulfilledRandomness(nonce, requestId, randomWords);
+    }
 }
