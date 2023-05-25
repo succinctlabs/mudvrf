@@ -40,5 +40,20 @@ export function defineContractComponents(world: World) {
         }
       );
     })(),
+    VRFCoordinatorAddress: (() => {
+      const tableId = new TableId("", "VRFCoordinatorAd");
+      return defineComponent(
+        world,
+        {
+          vrfCoordinatorAddress: RecsType.String,
+        },
+        {
+          metadata: {
+            contractId: tableId.toHexString(),
+            tableId: tableId.toString(),
+          },
+        }
+      );
+    })(),
   };
 }

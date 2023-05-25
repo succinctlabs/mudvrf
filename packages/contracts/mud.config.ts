@@ -24,6 +24,13 @@ export default mudConfig({
         user: "address"
       }
     },
+    VRFCoordinatorAddress: {
+      directory: "modules/vrf/tables", 
+      keySchema: {},
+      schema: {
+        vrfCoordinatorAddress: "address"
+      }
+    }
   },
   modules: [
     {

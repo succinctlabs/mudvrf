@@ -5,3 +5,4 @@ pragma solidity >=0.8.0;
 
 import { BlackJack, BlackJackData, BlackJackTableId } from "./tables/BlackJack.sol";
 import { RequestIdToBlackJackUser, RequestIdToBlackJackUserTableId } from "./tables/RequestIdToBlackJackUser.sol";
+import { VRFCoordinatorAddress, VRFCoordinatorAddressTableId } from "./modules/vrf/tables/VRFCoordinatorAddress.sol";
