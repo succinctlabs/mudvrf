@@ -12,40 +12,60 @@ import (
 	"github.com/jtguibas/mudvrf/server"
 )
 
-type WorldsJson struct {
+type VRFDeploymentJSON struct {
+	VrfCoordinatorAddress string `json:"vrfCoordinatorAddress"`
+}
+
+type WorldDeploymentJSON struct {
 	Foundry struct {
 		Address string `json:"address"`
 	} `json:"31337"`
 }
 
 func main() {
+	// Load WorldDeploymentJSON.
+	worldJson := WorldDeploymentJSON{}
+	worldJsonFile, err := os.Open("../packages/contracts/worlds.json")
+	if err != nil {
+		panic(err)
+	}
+	worldsJsonBytes, err := ioutil.ReadAll(worldJsonFile)
+	if err != nil {
+		panic(err)
+	}
+	err = json.Unmarshal(worldsJsonBytes, &worldJson)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("World Address:", worldJson.Foundry.Address)
 
-	// echo PWD
-	pwd, _ := os.Getwd()
-	fmt.Println(pwd)
+	// Load VRFDeploymentJSON.
+	vrfJson := VRFDeploymentJSON{}
+	vrfJsonFile, err := os.Open("../packages/contracts/vrf.json")
+	if err != nil {
+		panic(err)
+	}
+	vrfJsonBytes, err := ioutil.ReadAll(vrfJsonFile)
+	if err != nil {
+		panic(err)
+	}
+	err = json.Unmarshal(vrfJsonBytes, &vrfJson)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("VRFCoordinator Address:", vrfJson.VrfCoordinatorAddress)
 
-	// load json from ../packages/worlds.json
-	worldsJson := WorldsJson{}
-	jsonFile, err := os.Open("../packages/contracts/worlds.json")
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-	fmt.Println(string(byteValue))
-	json.Unmarshal(byteValue, &worldsJson)
-	fmt.Printf("%+v\n", worldsJson)
-
+	// Load enviroment.
 	godotenv.Load()
-	// load from env
-	privateKey := os.Getenv("PRIVATE_KEY")
-	// rawAddr := os.Getenv("CONTRACT_ADDRESS")
 	rpcUrl := os.Getenv("RPC_URL")
-	rawAddr := worldsJson.Foundry.Address
+	privateKey := os.Getenv("PRIVATE_KEY")
 
+	// Connect to RPC and start server.
 	ethclient, err := ethclient.Dial(rpcUrl)
 	if err != nil {
 		panic(err)
 	}
-
-	contractAddress := common.HexToAddress(rawAddr)
-
-	server := server.New(privateKey, contractAddress, ethclient)
+	worldAddress := common.HexToAddress(worldJson.Foundry.Address)
+	server := server.New(privateKey, worldAddress, ethclient)
 	server.Start()
 }
