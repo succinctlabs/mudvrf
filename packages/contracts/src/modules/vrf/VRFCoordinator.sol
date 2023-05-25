@@ -135,7 +135,7 @@ contract VRFCoordinator is VRF {
         bytes32 blockHash = blockhash(_request.blockNumber);
         if (blockHash == bytes32(0)) {
             blockHash = storageProofOracle.getBlockHash(_request.blockNumber);
-            require(blockHash != bytes32(0), "please prove blockhash");
+            require(blockHash != bytes32(0), "Block hash is not proven.");
         }
         uint256 actualSeed = uint256(keccak256(abi.encodePacked(_proof.seed, blockHash)));
 
