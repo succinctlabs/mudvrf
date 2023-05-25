@@ -12,11 +12,10 @@ contract PostDeploy is Script {
         // Load the private key from the `PRIVATE_KEY` environment variable (in .env)
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
-        // Deploy VRFCoordinator.
-        // vm.startBroadcast(deployerPrivateKey);
-        // if (block.chainid == ANVIL_CHAIN_ID) {
-        //     VRFCoordinator coordinator = new VRFCoordinator();
-        // }
-        // vm.stopBroadcast();
+        // Deploy VRFCoordinator & Set Coordinator
+        vm.startBroadcast(deployerPrivateKey);
+        VRFCoordinator coordinator = new VRFCoordinator();
+        IWorld(worldAddress).setCoordinator(address(coordinator));
+        vm.stopBroadcast();
     }
 }

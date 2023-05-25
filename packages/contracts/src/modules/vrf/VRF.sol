@@ -528,6 +528,16 @@ contract VRF {
     // Corresponds to vrfRandomOutputHashPrefix in vrf.go
     uint256 internal constant VRF_RANDOM_OUTPUT_HASH_PREFIX = 3;
 
+    struct Request {
+        address sender;
+        uint64 blockNumber;
+        bytes32 oracleId;
+        uint16 requestConfirmations;
+        uint32 callbackGasLimit;
+        uint32 nbWords;
+        bytes4 callbackSelector;
+    }
+
     struct Proof {
         uint256[2] pk;
         uint256[2] gamma;
