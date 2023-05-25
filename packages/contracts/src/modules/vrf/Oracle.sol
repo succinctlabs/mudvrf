@@ -1,10 +1,8 @@
-pragma solidity ^0.8.16;
+// SPDX-License-Identifier: MIT
+pragma solidity >=0.8.0;
 
-import {StorageProof} from "src/libraries/StateProofHelper.sol";
-import {RLPReader} from "@optimism-bedrock/rlp/RLPReader.sol";
-import {Interpreter} from "src/evm/Interpreter.sol";
-import {Types} from "src/evm/Instructions.sol";
-import {IOracle} from "src/evm/IOracle.sol";
+import {RLPReader} from "./RLPReader.sol";
+import {IOracle} from "./IOracle.sol";
 
 abstract contract BaseOracle is IOracle {
     mapping(uint256 => bytes32) public blockHashes;
@@ -28,14 +26,9 @@ interface IBlockhashStore {
 }
 
 contract StorageProofOracle is BaseOracle {
-    address public immutable interpreter;
     address public immutable blockHashStore;
 
-    mapping(uint256 => bytes32) public stateRoots;
-    mapping(bytes32 => bytes32) public storageRoots;
-
-    constructor(address interpreterAddr, address blockHashStoreAddr) {
-        interpreter = interpreterAddr;
+    constructor(address blockHashStoreAddr) {
         blockHashStore = blockHashStoreAddr;
     }
 
