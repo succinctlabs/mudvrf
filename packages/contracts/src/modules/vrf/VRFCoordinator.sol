@@ -26,6 +26,9 @@ contract VRFCoordinator is VRF {
     /// @notice The request nonce.
     uint256 public nonce = 0;
 
+    /// @notice The storage proof oracle.
+    StorageProofOracle public storageProofOracle;
+
     /// @notice The mapping of request ids to commitments to what is stored in the request.
     mapping(bytes32 => bytes32) public requests;
 
@@ -53,13 +56,14 @@ contract VRFCoordinator is VRF {
     error InvalidRequestParameters();
     error FailedToFulfillRandomness();
 
-    constructor() {
+    constructor(address _storageProofOracle) {
         oracles[ORACLE_ID] = ORACLE_ADDRESS;
+        storageProofOracle = StorageProofOracle(_storageProofOracle);
     }
 
     /// @notice Requests random words from the VRF.
     /// @param _oracleId The address of the operator to get shares for.
-    /// @param _requestConfirmations The number of shares for the operator.
+    /// @param _requestConfirmations The number of blocks to wait before posting the VRF request.
     /// @param _callbackGasLimit The maximum amount of gas the callback can use.
     /// @param _nbWords The number of random words to request.
     /// @param _callbackSelector The selector of the callback function.
@@ -128,8 +132,11 @@ contract VRFCoordinator is VRF {
         }
         delete requests[requestId];
 
-        // TODO: Get real block hash!
-        bytes32 blockHash = bytes32(0);
+        bytes32 blockHash = blockhash(_request.blockNumber);
+        if (blockHash == bytes32(0)) {
+            blockHash = storageProofOracle.getBlockHash(_request.blockNumber);
+            require(blockHash != bytes32(0), "please prove blockhash");
+        }
         uint256 actualSeed = uint256(keccak256(abi.encodePacked(_proof.seed, blockHash)));
 
         uint256 randomness = VRF.randomValueFromVRFProof(_proof, actualSeed);
