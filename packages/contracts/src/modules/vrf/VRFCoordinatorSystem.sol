@@ -10,12 +10,9 @@ import {VRFCoordinatorAddress} from "./tables/VRFCoordinatorAddress.sol";
 /// @title VRFCoordinatorSystem
 /// @notice This contract handles requests and fulfillments of random words from a VRF.
 contract VRFCoordinatorSystem is System, VRF {
-    // address public constant admin = address(0);
-
     /// @notice Can be used to set the coordinator address.
     /// @param _coordinator The address of the coordinator.
     function setCoordinator(address _coordinator) external {
-        // require(_msgSender() == admin, "VRFCoordinatorSystem: not admin");
         VRFCoordinatorAddress.set(_coordinator);
     }
 

@@ -4,10 +4,11 @@ pragma solidity >=0.8.0;
 import {System} from "@latticexyz/world/src/System.sol";
 
 import {VRF} from "./VRF.sol";
+import {IVRFCoordinator} from "./interfaces/IVRFCoordinator.sol";
 
 /// @title VRFCoordinator
 /// @notice This contract handles requests and fulfillments of random words from a VRF.
-contract VRFCoordinator is VRF {
+contract VRFCoordinator is VRF, IVRFCoordinator {
     /// @notice The oracle identifier used for validating the VRF proof came from the oracle.
     bytes32 public constant ORACLE_ID = 0xc0a6c424ac7157ae408398df7e5f4552091a69125d5dfcb7b8c2659029395bdf;
 
@@ -32,18 +33,8 @@ contract VRFCoordinator is VRF {
     /// @notice The mapping of oracle ids to oracle addresses.
     mapping(bytes32 => address) public oracles;
 
-    struct VRFRequest {
-        address sender;
-        uint64 blockNumber;
-        bytes32 oracleId;
-        uint16 requestConfirmations;
-        uint32 callbackGasLimit;
-        uint32 nbWords;
-        bytes4 callbackSelector;
-    }
-
-    event RandomnessRequest(uint256 indexed nonce, bytes32 indexed requestId, bytes32 seed, uint64 nbWords);
-    event FulfilledRandomness(uint256 indexed nonce, bytes32 indexed requestId, uint256[] words);
+    event RequestRandomWords(uint256 indexed nonce, bytes32 indexed requestId, bytes32 seed, uint64 nbWords);
+    event FulfillRandomWords(uint256 indexed nonce, bytes32 indexed requestId, uint256[] words);
 
     error InvalidRequestConfirmations();
     error InvalidCallbackGasLimit();
@@ -94,13 +85,15 @@ contract VRFCoordinator is VRF {
         );
         nonce += 1;
 
+        emit RequestRandomWords(nonce, requestId, seed, _nbWords);
+
         return requestId;
     }
 
     /// @notice Fulfills the request for random words.
     /// @param _proof The address of the operator to get shares for.
     /// @param _request The number of shares for the operator.
-    function fulfillRandomWords(VRF.Proof memory _proof, VRFRequest memory _request) external {
+    function fulfillRandomWords(VRF.Proof memory _proof, VRF.Request memory _request) external {
         bytes32 oracleId = keccak256(abi.encode(_proof.pk));
         address oracle = oracles[oracleId];
         if (oracle == address(0)) {
@@ -145,6 +138,6 @@ contract VRFCoordinator is VRF {
             revert FailedToFulfillRandomness();
         }
 
-        emit FulfilledRandomness(nonce, requestId, randomWords);
+        emit FulfillRandomWords(nonce, requestId, randomWords);
     }
 }

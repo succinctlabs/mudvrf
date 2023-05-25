@@ -22,7 +22,10 @@ contract VRFCoordinatorModule is IModule, WorldContext {
         // Register system
         world.registerSystem(NAMESPACE, SYSTEM_NAME, vrfCoordinatorSystem, true);
 
-        // Register system's functions
+        // Register system functions
+        world.registerFunctionSelector(
+            NAMESPACE, SYSTEM_NAME, "setCoordinator", "(address)"
+        );
         world.registerFunctionSelector(
             NAMESPACE, SYSTEM_NAME, "requestRandomWords", "(bytes32,uint16,uint32,uint32,bytes4)"
         );
