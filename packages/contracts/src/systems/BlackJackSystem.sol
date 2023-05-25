@@ -15,7 +15,7 @@ contract BlackJackSystem is System {
 
     function requestRandomness(bytes4 selector) internal returns (bytes32) {
         bytes32 requestId = IVRFCoordinatorSystem(_world()).requestRandomWords(
-            address(this), ORACLE_ID, REQUEST_CONFIRMATIONS, CALLBACK_GAS_LIMIT, NB_WORDS, selector
+            ORACLE_ID, REQUEST_CONFIRMATIONS, CALLBACK_GAS_LIMIT, NB_WORDS, selector
         );
         RequestIdToBlackJackUser.set(requestId, _msgSender());
         return requestId;

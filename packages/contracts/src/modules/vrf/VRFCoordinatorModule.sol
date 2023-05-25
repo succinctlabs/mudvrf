@@ -5,12 +5,12 @@ import {IBaseWorld} from "@latticexyz/world/src/interfaces/IBaseWorld.sol";
 import {IModule} from "@latticexyz/world/src/interfaces/IModule.sol";
 import {WorldContext} from "@latticexyz/world/src/WorldContext.sol";
 
-import {VRFRequests} from "./tables/VRFRequests.sol";
+import {VRFCoordinator} from "./VRFCoordinator.sol";
 import {VRFCoordinatorSystem} from "./VRFCoordinatorSystem.sol";
 import {NAMESPACE, MODULE_NAME, SYSTEM_NAME, TABLE_NAME} from "./constants.sol";
 
 contract VRFCoordinatorModule is IModule, WorldContext {
-    VRFCoordinatorSystem public immutable vrfCoordinator = new VRFCoordinatorSystem();
+    VRFCoordinatorSystem public immutable vrfCoordinatorSystem = new VRFCoordinatorSystem();
 
     function getName() public pure returns (bytes16) {
         return MODULE_NAME;
@@ -20,11 +20,11 @@ contract VRFCoordinatorModule is IModule, WorldContext {
         IBaseWorld world = IBaseWorld(_world());
 
         // Register system
-        world.registerSystem(NAMESPACE, SYSTEM_NAME, vrfCoordinator, true);
+        world.registerSystem(NAMESPACE, SYSTEM_NAME, vrfCoordinatorSystem, true);
 
         // Register system's functions
         world.registerFunctionSelector(
-            NAMESPACE, SYSTEM_NAME, "requestRandomWords", "(address,bytes32,uint16,uint32,uint32,bytes4)"
+            NAMESPACE, SYSTEM_NAME, "requestRandomWords", "(bytes32,uint16,uint32,uint32,bytes4)"
         );
     }
 }
