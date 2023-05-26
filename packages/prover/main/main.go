@@ -68,7 +68,11 @@ func main() {
 		panic(err)
 	}
 	vrfCoordinatorAddress := common.HexToAddress(vrfJson.VrfCoordinatorAddress)
+<<<<<<< HEAD:packages/prover/main/main.go
 	blockHashStoreAddress := common.HexToAddress(vrfJson.BlockHashStoreAddress)
 	server := server.New(privateKey, vrfCoordinatorAddress, blockHashStoreAddress, ethclient)
+=======
+	server := server.New(privateKey, vrfCoordinatorAddress, ethclient)
+>>>>>>> 4117d80 (lil-relayer is getting fulfilled randomness requests):backend/main/main.go
 	server.Start()
 }
