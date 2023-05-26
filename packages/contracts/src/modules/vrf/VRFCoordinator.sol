@@ -5,6 +5,7 @@ import {System} from "@latticexyz/world/src/System.sol";
 
 import {VRF} from "./VRF.sol";
 import {IVRFCoordinator} from "./interfaces/IVRFCoordinator.sol";
+import {StorageProofOracle} from "./Oracle.sol";
 
 /// @title VRFCoordinator
 /// @notice This contract handles requests and fulfillments of random words from a VRF.

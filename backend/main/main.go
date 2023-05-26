@@ -65,7 +65,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	worldAddress := common.HexToAddress(worldJson.Foundry.Address)
-	server := server.New(privateKey, worldAddress, ethclient)
+	vrfCoordinatorAddress := common.HexToAddress(vrfJson.VrfCoordinatorAddress)
+	server := server.New(privateKey, vrfCoordinatorAddress, ethclient)
 	server.Start()
 }
