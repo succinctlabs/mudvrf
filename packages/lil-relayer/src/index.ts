@@ -1,10 +1,9 @@
-import {VRF} from "../types/ethers-contracts/VRFCoordinator";
-import {MockVRFCoordinator, RandomnessRequestEventObject} from "../types/ethers-contracts/MockVRFCoordinator";
-import {MockVRFCoordinator__factory} from "../types/ethers-contracts/factories/MockVRFCoordinator__Factory";
+import {VRF} from "./types/ethers-contracts/VRFCoordinator";
+import {MockVRFCoordinator, RandomnessRequestEventObject} from "./types/ethers-contracts/MockVRFCoordinator";
+import {MockVRFCoordinator__factory} from "./types/ethers-contracts/factories/MockVRFCoordinator__Factory";
 import { ethers, utils } from 'ethers';
 import { AbiCoder } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
-
 
 async function main() {
     console.log("Listening for randomness requests...");
@@ -20,8 +19,8 @@ async function main() {
 
     const handleFulfilledRandomness = async (nonce: string, requestId: string, words: string[]) => {
         console.log("Randomness fulfilled");
-        console.log("requestId: ", BigNumber.from(nonce).toNumber());
-        console.log("randomness: ", BigNumber.from(requestId).toNumber());
+        console.log("requestId: ", BigNumber.from(nonce).toBigInt());
+        console.log("randomness: ", BigNumber.from(requestId).toBigInt());
         console.log("words: ", words);
     };
 
@@ -29,8 +28,7 @@ async function main() {
         // Log all of the parameters
         console.log("Randomness request received");
 
-        // Call the fulfillRandomWords function
-
+        // Unused in mock
         const proof: VRF.ProofStruct = {
             pk: [requestId, requestId],
             gamma: [requestId, requestId],
