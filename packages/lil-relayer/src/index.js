@@ -46,7 +46,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var MockVRFCoordinator__Factory_1 = require("./types/ethers-contracts/factories/MockVRFCoordinator__Factory");
 var ethers_1 = require("ethers");
 var ethers_2 = require("ethers");
@@ -123,7 +123,7 @@ function main() {
                         requestConfirmations: 0,
                         callbackGasLimit: callbackGasLimit,
                         nbWords: nbWords,
-                        callbackSelector: callbackSelector,
+                        callbackSelector: callbackSelector
                     };
                     console.log("Callback Selector: ", callbackSelector);
                     console.log("nbWords: ", ethers_2.BigNumber.from(nbWords).toNumber());
