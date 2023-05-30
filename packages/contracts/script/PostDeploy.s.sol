@@ -18,7 +18,7 @@ contract PostDeploy is Script {
         vm.startBroadcast(deployerPrivateKey);
         address coordinator;
         if (block.chainid == ANVIL_CHAIN_ID) {
-            coordinator = address(new VRFCoordinator());
+            coordinator = address(new VRFCoordinator(address(0)));
         }
         IWorld(worldAddress).setCoordinator(coordinator);
         vm.stopBroadcast();
