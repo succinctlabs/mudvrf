@@ -14,14 +14,15 @@ async function main() {
 
     const signer = wallet.connect(provider);
     // Get the contract address from PostDeploy
+
     const contractAddress = "0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690";
     const vrfCoordinator = MockVRFCoordinator__factory.connect(contractAddress, provider);
 
     const handleFulfilledRandomness = async (nonce: string, requestId: string, words: string[]) => {
         console.log("Randomness fulfilled");
-        console.log("requestId: ", BigNumber.from(nonce).toBigInt());
-        console.log("randomness: ", BigNumber.from(requestId).toBigInt());
-        console.log("words: ", words);
+        console.log("nonce: ", BigNumber.from(nonce).toBigInt());
+        console.log("requestId: ", BigNumber.from(requestId).toHexString());
+        console.log("words: ", (words).map((word) => BigNumber.from(word).toHexString()));
     };
 
     const handleRandomnessRequest = async (nonce: string, requestId: string, sender: string, blockNumber: string, seed: string, callbackGasLimit: string, nbWords: string, callbackSelector: string) => {
@@ -54,13 +55,31 @@ async function main() {
             callbackSelector: callbackSelector,
         }
 
+        console.log("Callback Selector: ", callbackSelector);
+
         console.log("nbWords: ", BigNumber.from(nbWords).toNumber());
 
-        const txResponse = await vrfCoordinator.connect(signer).fulfillRandomWords(proof, request);
-        const receipt = await txResponse.wait();
-        console.log(receipt);
-
-
+        async function submitTransaction() {
+            try {
+            const txData = vrfCoordinator.connect(signer).fulfillRandomWords(proof, request);
+            const txOptions = { gasLimit: 300000, gasPrice: ethers.utils.parseUnits('20', 'gwei') };
+              const transaction = await signer.sendTransaction({ ...txData, ...txOptions });
+              console.log('Transaction submitted:', transaction.hash);
+          
+              // Wait for the transaction to be mined
+              const receipt = await transaction.wait();
+              console.log('Transaction mined:', receipt.transactionHash);
+          
+              // Handle the transaction success
+              // ...
+            } catch (error) {
+              // Handle revert or exception
+              console.error('Transaction failed:', error);
+              return;
+            }
+        }
+          
+        submitTransaction();
 
         console.log("Submitted fulfillRandomWords transaction");
     };
@@ -70,6 +89,7 @@ async function main() {
     // Handle exit signals
     process.on('SIGINT', () => {
         vrfCoordinator.removeAllListeners('RandomnessRequested');
+        vrfCoordinator.removeAllListeners('FulfilledRandomness');
         console.log('Server shutting down...');
         process.exit();
     });

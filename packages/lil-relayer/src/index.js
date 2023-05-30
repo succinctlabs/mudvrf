@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -53,52 +64,72 @@ function main() {
             handleFulfilledRandomness = function (nonce, requestId, words) { return __awaiter(_this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     console.log("Randomness fulfilled");
-                    console.log("requestId: ", ethers_2.BigNumber.from(nonce).toBigInt());
-                    console.log("randomness: ", ethers_2.BigNumber.from(requestId).toBigInt());
-                    console.log("words: ", words);
+                    console.log("nonce: ", ethers_2.BigNumber.from(nonce).toBigInt());
+                    console.log("requestId: ", ethers_2.BigNumber.from(requestId).toHexString());
+                    console.log("words: ", (words).map(function (word) { return ethers_2.BigNumber.from(word).toHexString(); }));
                     return [2 /*return*/];
                 });
             }); };
             handleRandomnessRequest = function (nonce, requestId, sender, blockNumber, seed, callbackGasLimit, nbWords, callbackSelector) { return __awaiter(_this, void 0, void 0, function () {
-                var proof, oracleId, request, txResponse, receipt;
+                function submitTransaction() {
+                    return __awaiter(this, void 0, void 0, function () {
+                        var txData, txOptions, transaction, receipt, error_1;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    _a.trys.push([0, 3, , 4]);
+                                    txData = vrfCoordinator.connect(signer).fulfillRandomWords(proof, request);
+                                    txOptions = { gasLimit: 300000, gasPrice: ethers_1.ethers.utils.parseUnits('20', 'gwei') };
+                                    return [4 /*yield*/, signer.sendTransaction(__assign(__assign({}, txData), txOptions))];
+                                case 1:
+                                    transaction = _a.sent();
+                                    console.log('Transaction submitted:', transaction.hash);
+                                    return [4 /*yield*/, transaction.wait()];
+                                case 2:
+                                    receipt = _a.sent();
+                                    console.log('Transaction mined:', receipt.transactionHash);
+                                    return [3 /*break*/, 4];
+                                case 3:
+                                    error_1 = _a.sent();
+                                    // Handle revert or exception
+                                    console.error('Transaction failed:', error_1);
+                                    return [2 /*return*/];
+                                case 4: return [2 /*return*/];
+                            }
+                        });
+                    });
+                }
+                var proof, oracleId, request;
                 return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            // Log all of the parameters
-                            console.log("Randomness request received");
-                            proof = {
-                                pk: [requestId, requestId],
-                                gamma: [requestId, requestId],
-                                c: requestId,
-                                s: requestId,
-                                seed: requestId,
-                                uWitness: sender,
-                                cGammaWitness: [requestId, requestId],
-                                sHashWitness: [requestId, requestId],
-                                zInv: requestId
-                            };
-                            oracleId = ethers_1.utils.keccak256(ethers_1.utils.defaultAbiCoder.encode(["address", "uint256"], [sender, nonce]));
-                            request = {
-                                sender: sender,
-                                nonce: nonce,
-                                blockNumber: blockNumber,
-                                oracleId: oracleId,
-                                requestConfirmations: 0,
-                                callbackGasLimit: callbackGasLimit,
-                                nbWords: nbWords,
-                                callbackSelector: callbackSelector,
-                            };
-                            console.log("nbWords: ", ethers_2.BigNumber.from(nbWords).toNumber());
-                            return [4 /*yield*/, vrfCoordinator.connect(signer).fulfillRandomWords(proof, request)];
-                        case 1:
-                            txResponse = _a.sent();
-                            return [4 /*yield*/, txResponse.wait()];
-                        case 2:
-                            receipt = _a.sent();
-                            console.log(receipt);
-                            console.log("Submitted fulfillRandomWords transaction");
-                            return [2 /*return*/];
-                    }
+                    // Log all of the parameters
+                    console.log("Randomness request received");
+                    proof = {
+                        pk: [requestId, requestId],
+                        gamma: [requestId, requestId],
+                        c: requestId,
+                        s: requestId,
+                        seed: requestId,
+                        uWitness: sender,
+                        cGammaWitness: [requestId, requestId],
+                        sHashWitness: [requestId, requestId],
+                        zInv: requestId
+                    };
+                    oracleId = ethers_1.utils.keccak256(ethers_1.utils.defaultAbiCoder.encode(["address", "uint256"], [sender, nonce]));
+                    request = {
+                        sender: sender,
+                        nonce: nonce,
+                        blockNumber: blockNumber,
+                        oracleId: oracleId,
+                        requestConfirmations: 0,
+                        callbackGasLimit: callbackGasLimit,
+                        nbWords: nbWords,
+                        callbackSelector: callbackSelector,
+                    };
+                    console.log("Callback Selector: ", callbackSelector);
+                    console.log("nbWords: ", ethers_2.BigNumber.from(nbWords).toNumber());
+                    submitTransaction();
+                    console.log("Submitted fulfillRandomWords transaction");
+                    return [2 /*return*/];
                 });
             }); };
             vrfCoordinator.on("RandomnessRequest", handleRandomnessRequest);
@@ -106,6 +137,7 @@ function main() {
             // Handle exit signals
             process.on('SIGINT', function () {
                 vrfCoordinator.removeAllListeners('RandomnessRequested');
+                vrfCoordinator.removeAllListeners('FulfilledRandomness');
                 console.log('Server shutting down...');
                 process.exit();
             });
