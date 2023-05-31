@@ -1,0 +1,11 @@
+{
+    "name": "prover",
+    "version": "0.0.0",
+    "private": true,
+    "license": "MIT",
+    "scripts": {
+        "dev": "go run main/main.go"
+    },
+    "devDependencies": {}
+}
+  
