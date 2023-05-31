@@ -5,16 +5,16 @@ import {System} from "@latticexyz/world/src/System.sol";
 
 import {VRF} from "./VRF.sol";
 import {IVRFCoordinator} from "./interfaces/IVRFCoordinator.sol";
-import {StorageProofOracle} from "./Oracle.sol";
+import {BlockHashStore} from "./BlockHashStore.sol";
 
 /// @title VRFCoordinator
 /// @notice This contract handles requests and fulfillments of random words from a VRF.
 contract VRFCoordinator is VRF, IVRFCoordinator {
     /// @notice The oracle identifier used for validating the VRF proof came from the oracle.
-    bytes32 public constant ORACLE_ID = 0xc0a6c424ac7157ae408398df7e5f4552091a69125d5dfcb7b8c2659029395bdf;
+    bytes32 public constant ORACLE_ID = 0xc1ffd3cfee2d9e5cd67643f8f39fd6e51aad88f6f4ce6ab8827279cfffb92266;
 
     /// @notice The oracle address used for validating that the VRF proof came from the oracle.
-    address public constant ORACLE_ADDRESS = 0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf;
+    address public constant ORACLE_ADDRESS = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
 
     /// @notice The minimum number of request confirmatins.
     uint16 public constant MINIMUM_REQUEST_CONFIRMATIONS = 0;
@@ -29,7 +29,7 @@ contract VRFCoordinator is VRF, IVRFCoordinator {
     uint256 public nonce = 0;
 
     /// @notice The storage proof oracle.
-    StorageProofOracle public storageProofOracle;
+    BlockHashStore public blockHashStore;
 
     /// @notice The mapping of request ids to commitments to what is stored in the request.
     mapping(bytes32 => bytes32) public requests;
@@ -37,8 +37,17 @@ contract VRFCoordinator is VRF, IVRFCoordinator {
     /// @notice The mapping of oracle ids to oracle addresses.
     mapping(bytes32 => address) public oracles;
 
-    event RequestRandomWords(uint256 indexed nonce, bytes32 indexed requestId, bytes32 seed, uint64 nbWords);
-    event FulfillRandomWords(uint256 indexed nonce, bytes32 indexed requestId, uint256[] words);
+    event RequestRandomWords(
+        bytes32 requestId,
+        address sender,
+        uint256 nonce,
+        bytes32 oracleId,
+        uint32 nbWords,
+        uint16 requestConfirmations,
+        uint32 callbackGasLimit,
+        bytes4 callbackSelector
+    );
+    event FulfillRandomWords(bytes32 requestId);
 
     error InvalidRequestConfirmations();
     error InvalidCallbackGasLimit();
@@ -48,9 +57,9 @@ contract VRFCoordinator is VRF, IVRFCoordinator {
     error InvalidRequestParameters();
     error FailedToFulfillRandomness();
 
-    constructor(address _storageProofOracle) {
+    constructor(address _blockHashStore) {
         oracles[ORACLE_ID] = ORACLE_ADDRESS;
-        storageProofOracle = StorageProofOracle(_storageProofOracle);
+        blockHashStore = BlockHashStore(_blockHashStore);
     }
 
     /// @notice Requests random words from the VRF.
@@ -61,9 +70,9 @@ contract VRFCoordinator is VRF, IVRFCoordinator {
     /// @param _callbackSelector The selector of the callback function.
     function requestRandomWords(
         bytes32 _oracleId,
+        uint32 _nbWords,
         uint16 _requestConfirmations,
         uint32 _callbackGasLimit,
-        uint32 _nbWords,
         bytes4 _callbackSelector
     ) external returns (bytes32) {
         if (_requestConfirmations < MINIMUM_REQUEST_CONFIRMATIONS) {
@@ -80,18 +89,27 @@ contract VRFCoordinator is VRF, IVRFCoordinator {
             abi.encode(
                 requestId,
                 msg.sender,
-                block.number,
+                nonce,
                 _oracleId,
+                _nbWords,
                 _requestConfirmations,
                 _callbackGasLimit,
-                _nbWords,
                 _callbackSelector
             )
         );
+
+        emit RequestRandomWords(
+            requestId,
+            msg.sender,
+            nonce,
+            _oracleId,
+            _nbWords,
+            _requestConfirmations,
+            _callbackGasLimit,
+            _callbackSelector
+        );
+
         nonce += 1;
-
-        emit RequestRandomWords(nonce, requestId, seed, _nbWords);
-
         return requestId;
     }
 
@@ -105,33 +123,30 @@ contract VRFCoordinator is VRF, IVRFCoordinator {
             revert InvalidOracleId();
         }
 
-        bytes32 requestId = keccak256(abi.encode(oracleId, _proof.seed));
+        bytes32 seed = keccak256(abi.encode(_request.sender, _request.nonce));
+        bytes32 requestId = keccak256(abi.encode(oracleId, seed));
         bytes32 commitment = requests[requestId];
         bytes32 expectedCommitment = keccak256(
             abi.encode(
                 requestId,
                 _request.sender,
-                _request.blockNumber,
+                _request.nonce,
                 _request.oracleId,
+                _request.nbWords,
                 _request.requestConfirmations,
                 _request.callbackGasLimit,
-                _request.nbWords,
                 _request.callbackSelector
             )
         );
         if (commitment == bytes32(0)) {
-            revert InvalidCommitment();
+            revert("Invalid commitment 1");
         } else if (commitment != expectedCommitment) {
-            revert InvalidCommitment();
+            revert("Invalid commitment 2");
         }
         delete requests[requestId];
 
-        bytes32 blockHash = blockhash(_request.blockNumber);
-        if (blockHash == bytes32(0)) {
-            blockHash = storageProofOracle.getBlockHash(_request.blockNumber);
-            require(blockHash != bytes32(0), "Block hash is not proven.");
-        }
-        uint256 actualSeed = uint256(keccak256(abi.encodePacked(_proof.seed, blockHash)));
+        bytes32 blockHash = blockHashStore.getBlockHash(_request.blockNumber);
+        uint256 actualSeed = uint256(keccak256(abi.encodePacked(seed, blockHash)));
 
         uint256 randomness = VRF.randomValueFromVRFProof(_proof, actualSeed);
         uint256[] memory randomWords = new uint256[](_request.nbWords);
@@ -146,6 +161,6 @@ contract VRFCoordinator is VRF, IVRFCoordinator {
             revert FailedToFulfillRandomness();
         }
 
-        emit FulfillRandomWords(nonce, requestId, randomWords);
+        emit FulfillRandomWords(requestId);
     }
 }

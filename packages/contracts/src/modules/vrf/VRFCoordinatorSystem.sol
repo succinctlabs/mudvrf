@@ -24,17 +24,17 @@ contract VRFCoordinatorSystem is System, VRF {
     /// @param _callbackSelector The selector of the callback function.
     function requestRandomWords(
         bytes32 _oracleId,
+        uint32 _nbWords,
         uint16 _requestConfirmations,
         uint32 _callbackGasLimit,
-        uint32 _nbWords,
         bytes4 _callbackSelector
     ) external returns (bytes32) {
         address coordinator = VRFCoordinatorAddress.get();
         bytes32 requestId = VRFCoordinator(coordinator).requestRandomWords(
             _oracleId,
+            _nbWords,
             _requestConfirmations,
             _callbackGasLimit,
-            _nbWords,
             _callbackSelector
         );
         return requestId;
