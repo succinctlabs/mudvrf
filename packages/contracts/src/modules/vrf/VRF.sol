@@ -530,11 +530,11 @@ contract VRF {
 
     struct Request {
         address sender;
-        uint64 blockNumber;
+        uint256 nonce;
         bytes32 oracleId;
+        uint32 nbWords;
         uint16 requestConfirmations;
         uint32 callbackGasLimit;
-        uint32 nbWords;
         bytes4 callbackSelector;
     }
 

@@ -8,9 +8,9 @@ interface IVRFCoordinatorSystem {
 
   function requestRandomWords(
     bytes32 _oracleId,
+    uint32 _nbWords,
     uint16 _requestConfirmations,
     uint32 _callbackGasLimit,
-    uint32 _nbWords,
     bytes4 _callbackSelector
   ) external returns (bytes32);
 }
