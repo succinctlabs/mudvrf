@@ -536,6 +536,7 @@ contract VRF {
         uint16 requestConfirmations;
         uint32 callbackGasLimit;
         bytes4 callbackSelector;
+        uint64 blockNumber;
     }
 
     struct Proof {

@@ -51,11 +51,12 @@ type VRFRequest struct {
 	RequestConfirmations uint16
 	CallbackGasLimit     uint32
 	CallbackSelector     [4]byte
+	BlockNumber          uint64
 }
 
 // VRFCoordinatorMetaData contains all meta data concerning the VRFCoordinator contract.
 var VRFCoordinatorMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_storageProofOracle\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"FailedToFulfillRandomness\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidCallbackGasLimit\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidCommitment\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidNumberOfWords\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidOracleId\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidRequestConfirmations\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidRequestParameters\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"requestId\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"oracleId\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint32\",\"name\":\"nbWords\",\"type\":\"uint32\"},{\"indexed\":false,\"internalType\":\"uint16\",\"name\":\"requestConfirmations\",\"type\":\"uint16\"},{\"indexed\":false,\"internalType\":\"uint32\",\"name\":\"callbackGasLimit\",\"type\":\"uint32\"},{\"indexed\":false,\"internalType\":\"bytes4\",\"name\":\"callbackSelector\",\"type\":\"bytes4\"}],\"name\":\"RequestRandomWords\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"MAXIMUM_CALLBACK_GAS_LIMIT\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"MAXIMUM_NB_WORDS\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"MINIMUM_REQUEST_CONFIRMATIONS\",\"outputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"ORACLE_ADDRESS\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"ORACLE_ID\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"uint256[2]\",\"name\":\"pk\",\"type\":\"uint256[2]\"},{\"internalType\":\"uint256[2]\",\"name\":\"gamma\",\"type\":\"uint256[2]\"},{\"internalType\":\"uint256\",\"name\":\"c\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"s\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"seed\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"uWitness\",\"type\":\"address\"},{\"internalType\":\"uint256[2]\",\"name\":\"cGammaWitness\",\"type\":\"uint256[2]\"},{\"internalType\":\"uint256[2]\",\"name\":\"sHashWitness\",\"type\":\"uint256[2]\"},{\"internalType\":\"uint256\",\"name\":\"zInv\",\"type\":\"uint256\"}],\"internalType\":\"structVRF.Proof\",\"name\":\"_proof\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"oracleId\",\"type\":\"bytes32\"},{\"internalType\":\"uint32\",\"name\":\"nbWords\",\"type\":\"uint32\"},{\"internalType\":\"uint16\",\"name\":\"requestConfirmations\",\"type\":\"uint16\"},{\"internalType\":\"uint32\",\"name\":\"callbackGasLimit\",\"type\":\"uint32\"},{\"internalType\":\"bytes4\",\"name\":\"callbackSelector\",\"type\":\"bytes4\"}],\"internalType\":\"structVRF.Request\",\"name\":\"_request\",\"type\":\"tuple\"}],\"name\":\"fulfillRandomWords\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"nonce\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"oracles\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_oracleId\",\"type\":\"bytes32\"},{\"internalType\":\"uint32\",\"name\":\"_nbWords\",\"type\":\"uint32\"},{\"internalType\":\"uint16\",\"name\":\"_requestConfirmations\",\"type\":\"uint16\"},{\"internalType\":\"uint32\",\"name\":\"_callbackGasLimit\",\"type\":\"uint32\"},{\"internalType\":\"bytes4\",\"name\":\"_callbackSelector\",\"type\":\"bytes4\"}],\"name\":\"requestRandomWords\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"requests\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"storageProofOracle\",\"outputs\":[{\"internalType\":\"contractStorageProofOracle\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_blockHashStore\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"FailedToFulfillRandomness\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidCallbackGasLimit\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidCommitment\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidNumberOfWords\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidOracleId\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidRequestConfirmations\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidRequestParameters\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"requestId\",\"type\":\"bytes32\"}],\"name\":\"FulfillRandomWords\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"requestId\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"oracleId\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"uint32\",\"name\":\"nbWords\",\"type\":\"uint32\"},{\"indexed\":false,\"internalType\":\"uint16\",\"name\":\"requestConfirmations\",\"type\":\"uint16\"},{\"indexed\":false,\"internalType\":\"uint32\",\"name\":\"callbackGasLimit\",\"type\":\"uint32\"},{\"indexed\":false,\"internalType\":\"bytes4\",\"name\":\"callbackSelector\",\"type\":\"bytes4\"}],\"name\":\"RequestRandomWords\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"MAXIMUM_CALLBACK_GAS_LIMIT\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"MAXIMUM_NB_WORDS\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"MINIMUM_REQUEST_CONFIRMATIONS\",\"outputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"ORACLE_ADDRESS\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"ORACLE_ID\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"blockHashStore\",\"outputs\":[{\"internalType\":\"contractBlockHashStore\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"uint256[2]\",\"name\":\"pk\",\"type\":\"uint256[2]\"},{\"internalType\":\"uint256[2]\",\"name\":\"gamma\",\"type\":\"uint256[2]\"},{\"internalType\":\"uint256\",\"name\":\"c\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"s\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"seed\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"uWitness\",\"type\":\"address\"},{\"internalType\":\"uint256[2]\",\"name\":\"cGammaWitness\",\"type\":\"uint256[2]\"},{\"internalType\":\"uint256[2]\",\"name\":\"sHashWitness\",\"type\":\"uint256[2]\"},{\"internalType\":\"uint256\",\"name\":\"zInv\",\"type\":\"uint256\"}],\"internalType\":\"structVRF.Proof\",\"name\":\"_proof\",\"type\":\"tuple\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"oracleId\",\"type\":\"bytes32\"},{\"internalType\":\"uint32\",\"name\":\"nbWords\",\"type\":\"uint32\"},{\"internalType\":\"uint16\",\"name\":\"requestConfirmations\",\"type\":\"uint16\"},{\"internalType\":\"uint32\",\"name\":\"callbackGasLimit\",\"type\":\"uint32\"},{\"internalType\":\"bytes4\",\"name\":\"callbackSelector\",\"type\":\"bytes4\"},{\"internalType\":\"uint64\",\"name\":\"blockNumber\",\"type\":\"uint64\"}],\"internalType\":\"structVRF.Request\",\"name\":\"_request\",\"type\":\"tuple\"}],\"name\":\"fulfillRandomWords\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"nonce\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"oracles\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"_oracleId\",\"type\":\"bytes32\"},{\"internalType\":\"uint32\",\"name\":\"_nbWords\",\"type\":\"uint32\"},{\"internalType\":\"uint16\",\"name\":\"_requestConfirmations\",\"type\":\"uint16\"},{\"internalType\":\"uint32\",\"name\":\"_callbackGasLimit\",\"type\":\"uint32\"},{\"internalType\":\"bytes4\",\"name\":\"_callbackSelector\",\"type\":\"bytes4\"}],\"name\":\"requestRandomWords\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"requests\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
 }
 
 // VRFCoordinatorABI is the input ABI used to generate the binding from.
@@ -359,6 +360,37 @@ func (_VRFCoordinator *VRFCoordinatorCallerSession) ORACLEID() ([32]byte, error)
 	return _VRFCoordinator.Contract.ORACLEID(&_VRFCoordinator.CallOpts)
 }
 
+// BlockHashStore is a free data retrieval call binding the contract method 0xa27c66f0.
+//
+// Solidity: function blockHashStore() view returns(address)
+func (_VRFCoordinator *VRFCoordinatorCaller) BlockHashStore(opts *bind.CallOpts) (common.Address, error) {
+	var out []interface{}
+	err := _VRFCoordinator.contract.Call(opts, &out, "blockHashStore")
+
+	if err != nil {
+		return *new(common.Address), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+
+	return out0, err
+
+}
+
+// BlockHashStore is a free data retrieval call binding the contract method 0xa27c66f0.
+//
+// Solidity: function blockHashStore() view returns(address)
+func (_VRFCoordinator *VRFCoordinatorSession) BlockHashStore() (common.Address, error) {
+	return _VRFCoordinator.Contract.BlockHashStore(&_VRFCoordinator.CallOpts)
+}
+
+// BlockHashStore is a free data retrieval call binding the contract method 0xa27c66f0.
+//
+// Solidity: function blockHashStore() view returns(address)
+func (_VRFCoordinator *VRFCoordinatorCallerSession) BlockHashStore() (common.Address, error) {
+	return _VRFCoordinator.Contract.BlockHashStore(&_VRFCoordinator.CallOpts)
+}
+
 // Nonce is a free data retrieval call binding the contract method 0xaffed0e0.
 //
 // Solidity: function nonce() view returns(uint256)
@@ -452,54 +484,23 @@ func (_VRFCoordinator *VRFCoordinatorCallerSession) Requests(arg0 [32]byte) ([32
 	return _VRFCoordinator.Contract.Requests(&_VRFCoordinator.CallOpts, arg0)
 }
 
-// StorageProofOracle is a free data retrieval call binding the contract method 0x67347b5f.
+// FulfillRandomWords is a paid mutator transaction binding the contract method 0x665e9677.
 //
-// Solidity: function storageProofOracle() view returns(address)
-func (_VRFCoordinator *VRFCoordinatorCaller) StorageProofOracle(opts *bind.CallOpts) (common.Address, error) {
-	var out []interface{}
-	err := _VRFCoordinator.contract.Call(opts, &out, "storageProofOracle")
-
-	if err != nil {
-		return *new(common.Address), err
-	}
-
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-
-	return out0, err
-
-}
-
-// StorageProofOracle is a free data retrieval call binding the contract method 0x67347b5f.
-//
-// Solidity: function storageProofOracle() view returns(address)
-func (_VRFCoordinator *VRFCoordinatorSession) StorageProofOracle() (common.Address, error) {
-	return _VRFCoordinator.Contract.StorageProofOracle(&_VRFCoordinator.CallOpts)
-}
-
-// StorageProofOracle is a free data retrieval call binding the contract method 0x67347b5f.
-//
-// Solidity: function storageProofOracle() view returns(address)
-func (_VRFCoordinator *VRFCoordinatorCallerSession) StorageProofOracle() (common.Address, error) {
-	return _VRFCoordinator.Contract.StorageProofOracle(&_VRFCoordinator.CallOpts)
-}
-
-// FulfillRandomWords is a paid mutator transaction binding the contract method 0xc5cb1c8e.
-//
-// Solidity: function fulfillRandomWords((uint256[2],uint256[2],uint256,uint256,uint256,address,uint256[2],uint256[2],uint256) _proof, (address,uint256,bytes32,uint32,uint16,uint32,bytes4) _request) returns()
+// Solidity: function fulfillRandomWords((uint256[2],uint256[2],uint256,uint256,uint256,address,uint256[2],uint256[2],uint256) _proof, (address,uint256,bytes32,uint32,uint16,uint32,bytes4,uint64) _request) returns()
 func (_VRFCoordinator *VRFCoordinatorTransactor) FulfillRandomWords(opts *bind.TransactOpts, _proof VRFProof, _request VRFRequest) (*types.Transaction, error) {
 	return _VRFCoordinator.contract.Transact(opts, "fulfillRandomWords", _proof, _request)
 }
 
-// FulfillRandomWords is a paid mutator transaction binding the contract method 0xc5cb1c8e.
+// FulfillRandomWords is a paid mutator transaction binding the contract method 0x665e9677.
 //
-// Solidity: function fulfillRandomWords((uint256[2],uint256[2],uint256,uint256,uint256,address,uint256[2],uint256[2],uint256) _proof, (address,uint256,bytes32,uint32,uint16,uint32,bytes4) _request) returns()
+// Solidity: function fulfillRandomWords((uint256[2],uint256[2],uint256,uint256,uint256,address,uint256[2],uint256[2],uint256) _proof, (address,uint256,bytes32,uint32,uint16,uint32,bytes4,uint64) _request) returns()
 func (_VRFCoordinator *VRFCoordinatorSession) FulfillRandomWords(_proof VRFProof, _request VRFRequest) (*types.Transaction, error) {
 	return _VRFCoordinator.Contract.FulfillRandomWords(&_VRFCoordinator.TransactOpts, _proof, _request)
 }
 
-// FulfillRandomWords is a paid mutator transaction binding the contract method 0xc5cb1c8e.
+// FulfillRandomWords is a paid mutator transaction binding the contract method 0x665e9677.
 //
-// Solidity: function fulfillRandomWords((uint256[2],uint256[2],uint256,uint256,uint256,address,uint256[2],uint256[2],uint256) _proof, (address,uint256,bytes32,uint32,uint16,uint32,bytes4) _request) returns()
+// Solidity: function fulfillRandomWords((uint256[2],uint256[2],uint256,uint256,uint256,address,uint256[2],uint256[2],uint256) _proof, (address,uint256,bytes32,uint32,uint16,uint32,bytes4,uint64) _request) returns()
 func (_VRFCoordinator *VRFCoordinatorTransactorSession) FulfillRandomWords(_proof VRFProof, _request VRFRequest) (*types.Transaction, error) {
 	return _VRFCoordinator.Contract.FulfillRandomWords(&_VRFCoordinator.TransactOpts, _proof, _request)
 }
@@ -523,6 +524,140 @@ func (_VRFCoordinator *VRFCoordinatorSession) RequestRandomWords(_oracleId [32]b
 // Solidity: function requestRandomWords(bytes32 _oracleId, uint32 _nbWords, uint16 _requestConfirmations, uint32 _callbackGasLimit, bytes4 _callbackSelector) returns(bytes32)
 func (_VRFCoordinator *VRFCoordinatorTransactorSession) RequestRandomWords(_oracleId [32]byte, _nbWords uint32, _requestConfirmations uint16, _callbackGasLimit uint32, _callbackSelector [4]byte) (*types.Transaction, error) {
 	return _VRFCoordinator.Contract.RequestRandomWords(&_VRFCoordinator.TransactOpts, _oracleId, _nbWords, _requestConfirmations, _callbackGasLimit, _callbackSelector)
+}
+
+// VRFCoordinatorFulfillRandomWordsIterator is returned from FilterFulfillRandomWords and is used to iterate over the raw logs and unpacked data for FulfillRandomWords events raised by the VRFCoordinator contract.
+type VRFCoordinatorFulfillRandomWordsIterator struct {
+	Event *VRFCoordinatorFulfillRandomWords // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *VRFCoordinatorFulfillRandomWordsIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(VRFCoordinatorFulfillRandomWords)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(VRFCoordinatorFulfillRandomWords)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *VRFCoordinatorFulfillRandomWordsIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *VRFCoordinatorFulfillRandomWordsIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// VRFCoordinatorFulfillRandomWords represents a FulfillRandomWords event raised by the VRFCoordinator contract.
+type VRFCoordinatorFulfillRandomWords struct {
+	RequestId [32]byte
+	Raw       types.Log // Blockchain specific contextual infos
+}
+
+// FilterFulfillRandomWords is a free log retrieval operation binding the contract event 0xcead8fe0b8a9b6edff3894ef85776106c81547e693ed797e954bdce4530213f6.
+//
+// Solidity: event FulfillRandomWords(bytes32 requestId)
+func (_VRFCoordinator *VRFCoordinatorFilterer) FilterFulfillRandomWords(opts *bind.FilterOpts) (*VRFCoordinatorFulfillRandomWordsIterator, error) {
+
+	logs, sub, err := _VRFCoordinator.contract.FilterLogs(opts, "FulfillRandomWords")
+	if err != nil {
+		return nil, err
+	}
+	return &VRFCoordinatorFulfillRandomWordsIterator{contract: _VRFCoordinator.contract, event: "FulfillRandomWords", logs: logs, sub: sub}, nil
+}
+
+// WatchFulfillRandomWords is a free log subscription operation binding the contract event 0xcead8fe0b8a9b6edff3894ef85776106c81547e693ed797e954bdce4530213f6.
+//
+// Solidity: event FulfillRandomWords(bytes32 requestId)
+func (_VRFCoordinator *VRFCoordinatorFilterer) WatchFulfillRandomWords(opts *bind.WatchOpts, sink chan<- *VRFCoordinatorFulfillRandomWords) (event.Subscription, error) {
+
+	logs, sub, err := _VRFCoordinator.contract.WatchLogs(opts, "FulfillRandomWords")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(VRFCoordinatorFulfillRandomWords)
+				if err := _VRFCoordinator.contract.UnpackLog(event, "FulfillRandomWords", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseFulfillRandomWords is a log parse operation binding the contract event 0xcead8fe0b8a9b6edff3894ef85776106c81547e693ed797e954bdce4530213f6.
+//
+// Solidity: event FulfillRandomWords(bytes32 requestId)
+func (_VRFCoordinator *VRFCoordinatorFilterer) ParseFulfillRandomWords(log types.Log) (*VRFCoordinatorFulfillRandomWords, error) {
+	event := new(VRFCoordinatorFulfillRandomWords)
+	if err := _VRFCoordinator.contract.UnpackLog(event, "FulfillRandomWords", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
 }
 
 // VRFCoordinatorRequestRandomWordsIterator is returned from FilterRequestRandomWords and is used to iterate over the raw logs and unpacked data for RequestRandomWords events raised by the VRFCoordinator contract.
