@@ -4,9 +4,9 @@ pragma solidity >=0.8.0;
 import {Script} from "forge-std/Script.sol";
 import {console} from "forge-std/console.sol";
 import {IWorld} from "../src/world/IWorld.sol";
-import {BlockHashStore} from "../src/modules/vrf/BlockHashStore.sol";
-import {VRFCoordinator} from "../src/modules/vrf/VRFCoordinator.sol";
-import {MockVRFCoordinator} from "../src/modules/vrf/mocks/MockVRFCoordinator.sol";
+import {BlockHashStore} from "../src/BlockHashStore.sol";
+import {VRFCoordinator} from "../src/VRFCoordinator.sol";
+import {MockVRFCoordinator} from "../src/mocks/MockVRFCoordinator.sol";
 
 contract PostDeploy is Script {
     uint256 constant ANVIL_CHAIN_ID = 31337; 

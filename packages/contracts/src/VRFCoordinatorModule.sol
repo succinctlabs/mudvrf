@@ -7,6 +7,7 @@ import {WorldContext} from "@latticexyz/world/src/WorldContext.sol";
 
 import {VRFCoordinator} from "./VRFCoordinator.sol";
 import {VRFCoordinatorSystem} from "./VRFCoordinatorSystem.sol";
+import {VRFCoordinatorAddress} from "./tables/VRFCoordinatorAddress.sol";
 import {NAMESPACE, MODULE_NAME, SYSTEM_NAME, TABLE_NAME} from "./constants.sol";
 
 contract VRFCoordinatorModule is IModule, WorldContext {
@@ -21,6 +22,14 @@ contract VRFCoordinatorModule is IModule, WorldContext {
 
         // Register system
         world.registerSystem(NAMESPACE, SYSTEM_NAME, vrfCoordinatorSystem, true);
+
+        // Register tables
+        world.registerTable(
+            NAMESPACE,
+            TABLE_NAME,
+            VRFCoordinatorAddress.getSchema(),
+            VRFCoordinatorAddress.getKeySchema()
+        );
 
         // Register system functions
         world.registerFunctionSelector(

@@ -6,18 +6,9 @@ import './App.css'
 
 export const App = () => {
   const {
-    components: { RaffleCounter },
     systemCalls: { startGame, dealUser, standUser },
-    network: { storeCache, singletonEntity, worldContract },
+    network: { storeCache, worldContract },
   } = useMUD();
-
-  // const raffleId = useComponentValue(RaffleCounter, singletonEntity);
-
-  // const [inputRaffleId, setInputRaffleId] = useState(0);
-
-  // const onChangeHandler = (event: any) => {
-  //   setInputRaffleId(event.target.value);
-  // };
 
   const [address, setAddress] = useState("");
 
@@ -28,34 +19,13 @@ export const App = () => {
     set();
   }, [worldContract.signer]);
 
-  // const blackjackGames = useRows(storeCache, { table: "BlackJack" });
-  // const [game, setGame] = useState<typeof blackjackGames[number] | null>(null);
-  // useEffect(() => {
-  //   if (blackjackGames.length > 0) {
-  //     for (const game of blackjackGames) {
-  //       if (game.key.userAddress === address) {
-  //         setGame(game);
-  //         return;
-  //       }
-  //     }
-  //   }
-  //   setGame(null);
-  // }, [blackjackGames]);
-
-  // const entity = world.registerEntity({ id: address });
-
   const game = useRow(storeCache, {
     table: "BlackJack",
     key: { userAddress: address as any },
   });
 
   console.log(address, game);
-
-  // if (blackjackGames.length > 0) {
-  //   console.log(blackjackGames[0].value.userCards);
-  // }
-  // console.log("all games", blackjackGames);
-
+  
   const onProofChangeHandler = (event: any) => {
     console.log(JSON.parse(event.target.value));
   };
@@ -161,22 +131,6 @@ export const App = () => {
     <>
     <div style={{backgroundColor: ""}}>
       <h1>MUDVRF🎲</h1>
-      <code>
-        <pre>
-        ____
- /\' .\    _____
-/: \___\  / .  /\
-\' / . / /____/..\
- \/___/  \'  '\  /
-          \'__'\/
-          ____
- /\' .\    _____
-/: \___\  / .  /\
-\' / . / /____/..\
- \/___/  \'  '\  /
-          \'__'\/
-        </pre>
-      </code>
       <br></br>
       <button
         onClick={() => startGame()}
@@ -193,12 +147,12 @@ export const App = () => {
         <div key={game.key.userAddress}>
           <div>
             Dealer cards:{" "}
-            {game.value.dealerCards.map((card) => getCard(card)).join(", ")}
+            {game.value.dealerCards.map((card: any) => getCard(card)).join(", ")}
             ({renderHandTotal(game.value.dealerCards)})
           </div>
           <div>
             Your cards:{" "}
-            {game.value.userCards.map((card) => getCard(card)).join(", ")} (
+            {game.value.userCards.map((card: any) => getCard(card)).join(", ")} (
             {renderHandTotal(game.value.userCards)})
           </div>
           <div>
