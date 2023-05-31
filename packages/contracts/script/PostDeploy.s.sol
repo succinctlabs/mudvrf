@@ -20,6 +20,8 @@ contract PostDeploy is Script {
         address blockHashStore = address(new BlockHashStore());
         address coordinator = address(new VRFCoordinator(blockHashStore));
         IWorld(worldAddress).setCoordinator(coordinator);
+        console.log("COORDINATOR ADDRESS");
+        console.log(coordinator);
         vm.stopBroadcast();
 
         string memory obj1 = "vrfCoordinatorDeployment";

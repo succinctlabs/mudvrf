@@ -1,6 +1,7 @@
 import {VRF} from "./types/ethers-contracts/VRFCoordinator";
-import {MockVRFCoordinator, RandomnessRequestEventObject} from "./types/ethers-contracts/MockVRFCoordinator";
-import {MockVRFCoordinator__factory} from "../../contracts/types/ethers-contracts/factories/MockVRFCoordinator__Factory";
+import {VRFCoordinator__factory} from "./types/ethers-contracts/factories/VRFCoordinator__Factory";
+import {MockVRFCoordinator} from "./types/ethers-contracts/MockVRFCoordinator";
+import {MockVRFCoordinator__factory} from "./types/ethers-contracts/factories/MockVRFCoordinator__Factory";
 import { ethers, utils } from 'ethers';
 import { AbiCoder } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
@@ -8,15 +9,15 @@ import { BigNumber } from "ethers";
 async function main() {
     console.log("Listening for randomness requests...");
 
-    const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
+    const provider = new ethers.providers.StaticJsonRpcProvider("http://localhost:8545", 1337);
 
     const wallet = new ethers.Wallet("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80", provider);
 
     const signer = wallet.connect(provider);
     // Get the contract address from PostDeploy
 
-    const contractAddress = "0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690";
-    const vrfCoordinator = MockVRFCoordinator__factory.connect(contractAddress, provider);
+    const contractAddress = "0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB";
+    const vrfCoordinator = VRFCoordinator__factory.connect(contractAddress, provider);
 
     const handleFulfilledRandomness = async (nonce: string, requestId: string, words: string[]) => {
         console.log("Randomness fulfilled");
@@ -24,6 +25,8 @@ async function main() {
         console.log("requestId: ", BigNumber.from(requestId).toHexString());
         console.log("words: ", (words).map((word) => BigNumber.from(word).toHexString()));
     };
+
+    // console.log("Here: ", await vrfCoordinator.MAXIMUM_NB_WORDS());
 
     const handleRandomnessRequest = async (nonce: string, requestId: string, sender: string, blockNumber: string, seed: string, callbackGasLimit: string, nbWords: string, callbackSelector: string) => {
         // Log all of the parameters
@@ -83,13 +86,20 @@ async function main() {
 
         console.log("Submitted fulfillRandomWords transaction");
     };
-    vrfCoordinator.on("RandomnessRequest", handleRandomnessRequest);
-    vrfCoordinator.on("FulfilledRandomness", handleFulfilledRandomness);
+
+    try {
+        console.log("Num words", await vrfCoordinator.MAXIMUM_NB_WORDS());
+    } catch(e) {
+        console.log(e);
+    }
+
+    vrfCoordinator.on("RequestRandomWords", handleRandomnessRequest);
+    vrfCoordinator.on("FulfillRandomWords", handleFulfilledRandomness);
 
     // Handle exit signals
     process.on('SIGINT', () => {
-        vrfCoordinator.removeAllListeners('RandomnessRequested');
-        vrfCoordinator.removeAllListeners('FulfilledRandomness');
+        vrfCoordinator.removeAllListeners('RequestRandomWords');
+        vrfCoordinator.removeAllListeners('FulfillRandomWords');
         console.log('Server shutting down...');
         process.exit();
     });
