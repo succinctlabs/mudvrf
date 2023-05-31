@@ -14,6 +14,7 @@ import (
 
 type VRFDeploymentJSON struct {
 	VrfCoordinatorAddress string `json:"vrfCoordinatorAddress"`
+	BlockHashStoreAddress string `json:"blockHashStoreAddress"`
 }
 
 type WorldDeploymentJSON struct {
@@ -54,6 +55,7 @@ func main() {
 		panic(err)
 	}
 	fmt.Println("VRFCoordinator Address:", vrfJson.VrfCoordinatorAddress)
+	fmt.Println("BlockHashStore Address:", vrfJson.BlockHashStoreAddress)
 
 	// Load enviroment.
 	godotenv.Load()
@@ -66,6 +68,7 @@ func main() {
 		panic(err)
 	}
 	vrfCoordinatorAddress := common.HexToAddress(vrfJson.VrfCoordinatorAddress)
-	server := server.New(privateKey, vrfCoordinatorAddress, ethclient)
+	blockHashStoreAddress := common.HexToAddress(vrfJson.BlockHashStoreAddress)
+	server := server.New(privateKey, vrfCoordinatorAddress, blockHashStoreAddress, ethclient)
 	server.Start()
 }

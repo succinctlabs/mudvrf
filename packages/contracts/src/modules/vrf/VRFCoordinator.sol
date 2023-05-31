@@ -5,7 +5,7 @@ import {System} from "@latticexyz/world/src/System.sol";
 
 import {VRF} from "./VRF.sol";
 import {IVRFCoordinator} from "./interfaces/IVRFCoordinator.sol";
-import {StorageProofOracle} from "./Oracle.sol";
+import {BlockHashStore} from "./BlockHashStore.sol";
 
 /// @title VRFCoordinator
 /// @notice This contract handles requests and fulfillments of random words from a VRF.
@@ -29,7 +29,7 @@ contract VRFCoordinator is VRF, IVRFCoordinator {
     uint256 public nonce = 0;
 
     /// @notice The storage proof oracle.
-    StorageProofOracle public storageProofOracle;
+    BlockHashStore public blockHashStore;
 
     /// @notice The mapping of request ids to commitments to what is stored in the request.
     mapping(bytes32 => bytes32) public requests;
@@ -57,9 +57,9 @@ contract VRFCoordinator is VRF, IVRFCoordinator {
     error InvalidRequestParameters();
     error FailedToFulfillRandomness();
 
-    constructor(address _storageProofOracle) {
+    constructor(address _blockHashStore) {
         oracles[ORACLE_ID] = ORACLE_ADDRESS;
-        storageProofOracle = StorageProofOracle(_storageProofOracle);
+        blockHashStore = BlockHashStore(_blockHashStore);
     }
 
     /// @notice Requests random words from the VRF.
@@ -123,7 +123,8 @@ contract VRFCoordinator is VRF, IVRFCoordinator {
             revert InvalidOracleId();
         }
 
-        bytes32 requestId = keccak256(abi.encode(oracleId, _proof.seed));
+        bytes32 seed = keccak256(abi.encode(_request.sender, _request.nonce));
+        bytes32 requestId = keccak256(abi.encode(oracleId, seed));
         bytes32 commitment = requests[requestId];
         bytes32 expectedCommitment = keccak256(
             abi.encode(
@@ -138,20 +139,16 @@ contract VRFCoordinator is VRF, IVRFCoordinator {
             )
         );
         if (commitment == bytes32(0)) {
-            revert InvalidCommitment();
+            revert("Invalid commitment 1");
         } else if (commitment != expectedCommitment) {
-            revert InvalidCommitment();
+            revert("Invalid commitment 2");
         }
         delete requests[requestId];
 
-        // bytes32 blockHash = blockhash(_request.blockNumber);
-        // if (blockHash == bytes32(0)) {
-        //     blockHash = storageProofOracle.getBlockHash(_request.blockNumber);
-        //     require(blockHash != bytes32(0), "Block hash is not proven.");
-        // }
-        // uint256 actualSeed = uint256(keccak256(abi.encodePacked(_proof.seed, blockHash)));
+        bytes32 blockHash = blockHashStore.getBlockHash(_request.blockNumber);
+        uint256 actualSeed = uint256(keccak256(abi.encodePacked(seed, blockHash)));
 
-        uint256 randomness = VRF.randomValueFromVRFProof(_proof, _proof.seed);
+        uint256 randomness = VRF.randomValueFromVRFProof(_proof, actualSeed);
         uint256[] memory randomWords = new uint256[](_request.nbWords);
         for (uint256 i = 0; i < _request.nbWords; i++) {
             randomWords[i] = uint256(keccak256(abi.encode(randomness, i)));
