@@ -58,7 +58,7 @@ importers:
       '@latticexyz/world':
         specifier: 2.0.0-alpha.1.196
         version: 2.0.0-alpha.1.196(typescript@5.0.4)
-      '@succinctlabs/mudvrf-contracts':
+      '@succinctlabs/mudvrf':
         specifier: workspace:*
         version: link:../contracts
       '@wagmi/chains':
@@ -186,7 +186,7 @@ importers:
       '@latticexyz/world':
         specifier: 2.0.0-alpha.1.196
         version: 2.0.0-alpha.1.196(typescript@5.0.4)
-      '@succinctlabs/mudvrf-contracts':
+      '@succinctlabs/mudvrf':
         specifier: workspace:*
         version: link:../contracts
       ethers:
