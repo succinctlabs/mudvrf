@@ -3,7 +3,9 @@
     "version": "0.0.0",
     "private": true,
     "license": "MIT",
-    "scripts": {},
+    "scripts": {
+        "dev": "go run main/main.go"
+    },
     "devDependencies": {}
 }
   
