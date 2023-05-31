@@ -4,7 +4,6 @@ export default mudConfig({
   codegenDirectory: "",
   tables: {
     VRFCoordinatorAddress: {
-      directory: "modules/vrf/tables", 
       keySchema: {},
       schema: {
         vrfCoordinatorAddress: "address"
