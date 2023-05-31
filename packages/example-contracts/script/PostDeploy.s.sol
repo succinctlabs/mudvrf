@@ -20,7 +20,13 @@ contract PostDeploy is Script {
         vm.startBroadcast(deployerPrivateKey);
         address blockHashStore = address(new BlockHashStore());
         address coordinator = address(new VRFCoordinator(blockHashStore));
-        IVRFCoordinatorSystem(worldAddress).setCoordinator(coordinator);
+        IVRFCoordinatorSystem(worldAddress).requestRandomWords(
+            bytes32(0),
+            1,
+            1,
+            1,
+            bytes4(0)
+        );
         vm.stopBroadcast();
 
         string memory obj1 = "vrfCoordinatorDeployment";
