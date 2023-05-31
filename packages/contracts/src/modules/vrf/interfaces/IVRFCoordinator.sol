@@ -4,6 +4,26 @@ pragma solidity >=0.8.0;
 import {VRF} from "../VRF.sol";
 
 interface IVRFCoordinator {
+    event RequestRandomWords(
+        bytes32 requestId,
+        address sender,
+        uint256 nonce,
+        bytes32 oracleId,
+        uint32 nbWords,
+        uint16 requestConfirmations,
+        uint32 callbackGasLimit,
+        bytes4 callbackSelector
+    );
+    event FulfillRandomWords(bytes32 requestId);
+
+    error InvalidRequestConfirmations();
+    error InvalidCallbackGasLimit();
+    error InvalidNumberOfWords();
+    error InvalidOracleId();
+    error InvalidCommitment();
+    error InvalidRequestParameters();
+    error FailedToFulfillRandomness();
+
     function requestRandomWords(
         bytes32 _oracleId,
         uint32 _nbWords,

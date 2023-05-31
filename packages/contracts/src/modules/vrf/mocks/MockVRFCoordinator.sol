@@ -2,20 +2,127 @@
 pragma solidity >=0.8.0;
 
 import {VRF} from "../VRF.sol";
-import {VRFCoordinator} from "../VRFCoordinator.sol";
 import {IVRFCoordinator} from "../interfaces/IVRFCoordinator.sol";
+import {BlockHashStore} from "../BlockHashStore.sol";
 
 contract MockVRFCoordinator is IVRFCoordinator {
+    /// @notice The oracle identifier used for validating the VRF proof came from the oracle.
+    bytes32 public constant ORACLE_ID = 0xc1ffd3cfee2d9e5cd67643f8f39fd6e51aad88f6f4ce6ab8827279cfffb92266;
+
+    /// @notice The oracle address used for validating that the VRF proof came from the oracle.
+    address public constant ORACLE_ADDRESS = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+
+    /// @notice The minimum number of request confirmatins.
+    uint16 public constant MINIMUM_REQUEST_CONFIRMATIONS = 0;
+
+    /// @notice The maximum callback gas limit.
+    uint64 public constant MAXIMUM_CALLBACK_GAS_LIMIT = 10000000;
+
+    /// @notice The maximum number of random words that can be provided in the callback.
+    uint64 public constant MAXIMUM_NB_WORDS = 64;
+
+    /// @notice The request nonce.
+    uint256 public nonce = 0;
+
+    /// @notice The storage proof oracle.
+    BlockHashStore public blockHashStore;
+
+    /// @notice The mapping of request ids to commitments to what is stored in the request.
+    mapping(bytes32 => bytes32) public requests;
+
+    /// @notice The mapping of oracle ids to oracle addresses.
+    mapping(bytes32 => address) public oracles;
+
+    constructor(address _blockHashStore) {
+        oracles[ORACLE_ID] = ORACLE_ADDRESS;
+        blockHashStore = BlockHashStore(_blockHashStore);
+    }
+
     function requestRandomWords(
         bytes32 _oracleId,
         uint32 _nbWords,
         uint16 _requestConfirmations,
         uint32 _callbackGasLimit,
         bytes4 _callbackSelector
-    ) external returns (bytes32) {}
+    ) external returns (bytes32) {
+        if (_requestConfirmations < MINIMUM_REQUEST_CONFIRMATIONS) {
+            revert InvalidRequestConfirmations();
+        } else if (_callbackGasLimit > MAXIMUM_CALLBACK_GAS_LIMIT) {
+            revert InvalidCallbackGasLimit();
+        } else if (_nbWords > MAXIMUM_NB_WORDS) {
+            revert InvalidNumberOfWords();
+        }
+
+        bytes32 seed = keccak256(abi.encode(msg.sender, nonce));
+        bytes32 requestId = keccak256(abi.encode(seed));
+        requests[requestId] = keccak256(
+            abi.encode(
+                requestId,
+                msg.sender,
+                nonce,
+                _oracleId,
+                _nbWords,
+                _requestConfirmations,
+                _callbackGasLimit,
+                _callbackSelector
+            )
+        );
+
+        emit RequestRandomWords(
+            requestId,
+            msg.sender,
+            nonce,
+            _oracleId,
+            _nbWords,
+            _requestConfirmations,
+            _callbackGasLimit,
+            _callbackSelector
+        );
+
+        nonce += 1;
+        return requestId;
+    }
 
     function fulfillRandomWords(
         VRF.Proof memory _proof,
         VRF.Request memory _request
-    ) external {}
+    ) external {
+        bytes32 seed = keccak256(abi.encode(_request.sender, _request.nonce));
+        bytes32 requestId = keccak256(abi.encode(seed));
+        bytes32 commitment = requests[requestId];
+        bytes32 expectedCommitment = keccak256(
+            abi.encode(
+                requestId,
+                _request.sender,
+                _request.nonce,
+                _request.oracleId,
+                _request.nbWords,
+                _request.requestConfirmations,
+                _request.callbackGasLimit,
+                _request.callbackSelector
+            )
+        );
+        if (commitment == bytes32(0)) {
+            revert("Invalid commitment 1");
+        } else if (commitment != expectedCommitment) {
+            revert("Invalid commitment 2");
+        }
+        delete requests[requestId];
+
+        uint256 randomness = uint256(keccak256(abi.encodePacked(seed)));
+
+        uint256[] memory randomWords = new uint256[](_request.nbWords);
+        for (uint256 i = 0; i < _request.nbWords; i++) {
+            randomWords[i] = uint256(keccak256(abi.encode(randomness, i)));
+        }
+
+        bytes memory fulfillRandomnessCall = abi.encodeWithSelector(_request.callbackSelector, requestId, randomWords);
+        (bool status,) = _request.sender.call(fulfillRandomnessCall);
+
+        if (!status) {
+            revert FailedToFulfillRandomness();
+        }
+
+        emit FulfillRandomWords(requestId);
+    }
 }

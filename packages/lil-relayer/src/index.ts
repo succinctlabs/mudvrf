@@ -5,30 +5,31 @@ import {MockVRFCoordinator__factory} from "./types/ethers-contracts/factories/Mo
 import { ethers, utils } from 'ethers';
 import { AbiCoder } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
+import fs from "fs/promises";
 
 async function main() {
     console.log("Listening for randomness requests...");
 
-    const provider = new ethers.providers.StaticJsonRpcProvider("http://localhost:8545", 1337);
+    const provider = new ethers.providers.StaticJsonRpcProvider("http://127.0.0.1:8545", 31337);
 
     const wallet = new ethers.Wallet("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80", provider);
 
     const signer = wallet.connect(provider);
     // Get the contract address from PostDeploy
 
-    const contractAddress = "0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB";
-    const vrfCoordinator = VRFCoordinator__factory.connect(contractAddress, provider);
+    // Read address from vrf.json in contracts directory
+    // TODO: Parse this in type-safe way
+    const vrfJson = JSON.parse(await fs.readFile("../contracts/vrf.json", 'utf8'));
+    const contractAddress = vrfJson.vrfCoordinatorAddress;
+    const vrfCoordinator = MockVRFCoordinator__factory.connect(contractAddress, signer);
 
-    const handleFulfilledRandomness = async (nonce: string, requestId: string, words: string[]) => {
+    const handleFulfilledRandomness = async (requestId: string, event: ethers.Event) => {
         console.log("Randomness fulfilled");
-        console.log("nonce: ", BigNumber.from(nonce).toBigInt());
         console.log("requestId: ", BigNumber.from(requestId).toHexString());
-        console.log("words: ", (words).map((word) => BigNumber.from(word).toHexString()));
+        console.log("Fulfilled on block: ", event.blockNumber);
     };
 
-    // console.log("Here: ", await vrfCoordinator.MAXIMUM_NB_WORDS());
-
-    const handleRandomnessRequest = async (nonce: string, requestId: string, sender: string, blockNumber: string, seed: string, callbackGasLimit: string, nbWords: string, callbackSelector: string) => {
+    const handleRandomnessRequest = async (requestId: string, sender: string, nonce: string, oracleId: string, nbWords: string, requestConfirmations: string, callbackGasLimit: string, callbackSelector: string, event: ethers.Event) => {
         // Log all of the parameters
         console.log("Randomness request received");
 
@@ -45,33 +46,30 @@ async function main() {
             zInv: requestId
         }
 
-        const oracleId = utils.keccak256(utils.defaultAbiCoder.encode(["address", "uint256"], [sender, nonce]));
-
         const request: VRF.RequestStruct = {
             sender: sender,
-            nonce: nonce,
-            blockNumber: blockNumber,
+            nonce: BigNumber.from(nonce),
             oracleId: oracleId,
+            nbWords: BigNumber.from(nbWords),
             requestConfirmations: 0,
-            callbackGasLimit: callbackGasLimit,
-            nbWords: nbWords,
+            callbackGasLimit: BigNumber.from(callbackGasLimit),
             callbackSelector: callbackSelector,
+            blockNumber: BigNumber.from(event.blockNumber)
         }
-
-        console.log("Callback Selector: ", callbackSelector);
 
         console.log("nbWords: ", BigNumber.from(nbWords).toNumber());
 
         async function submitTransaction() {
             try {
-            const txData = vrfCoordinator.connect(signer).fulfillRandomWords(proof, request);
-            const txOptions = { gasLimit: 300000, gasPrice: ethers.utils.parseUnits('20', 'gwei') };
-              const transaction = await signer.sendTransaction({ ...txData, ...txOptions });
-              console.log('Transaction submitted:', transaction.hash);
+
+                const tx = await vrfCoordinator.fulfillRandomWords(proof, request, {
+                    gasLimit: 3000000,
+                    gasPrice: ethers.utils.parseUnits('200', 'gwei')
+                });
+                console.log('Transaction submitted:', tx.hash);
+                const receipt = await tx.wait();
           
-              // Wait for the transaction to be mined
-              const receipt = await transaction.wait();
-              console.log('Transaction mined:', receipt.transactionHash);
+                console.log('Transaction mined:', receipt.transactionHash);
           
               // Handle the transaction success
               // ...
@@ -86,12 +84,6 @@ async function main() {
 
         console.log("Submitted fulfillRandomWords transaction");
     };
-
-    try {
-        console.log("Num words", await vrfCoordinator.MAXIMUM_NB_WORDS());
-    } catch(e) {
-        console.log(e);
-    }
 
     vrfCoordinator.on("RequestRandomWords", handleRandomnessRequest);
     vrfCoordinator.on("FulfillRandomWords", handleFulfilledRandomness);

@@ -18,7 +18,12 @@ contract PostDeploy is Script {
         // Deploy VRFCoordinator & Set Coordinator
         vm.startBroadcast(deployerPrivateKey);
         address blockHashStore = address(new BlockHashStore());
-        address coordinator = address(new VRFCoordinator(blockHashStore));
+        address coordinator;
+        if (block.chainid == ANVIL_CHAIN_ID) {
+            coordinator = address(new MockVRFCoordinator(blockHashStore));
+        } else {
+            coordinator = address(new VRFCoordinator(blockHashStore));
+        }
         IWorld(worldAddress).setCoordinator(coordinator);
         console.log("COORDINATOR ADDRESS");
         console.log(coordinator);

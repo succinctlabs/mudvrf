@@ -37,26 +37,6 @@ contract VRFCoordinator is VRF, IVRFCoordinator {
     /// @notice The mapping of oracle ids to oracle addresses.
     mapping(bytes32 => address) public oracles;
 
-    event RequestRandomWords(
-        bytes32 requestId,
-        address sender,
-        uint256 nonce,
-        bytes32 oracleId,
-        uint32 nbWords,
-        uint16 requestConfirmations,
-        uint32 callbackGasLimit,
-        bytes4 callbackSelector
-    );
-    event FulfillRandomWords(bytes32 requestId);
-
-    error InvalidRequestConfirmations();
-    error InvalidCallbackGasLimit();
-    error InvalidNumberOfWords();
-    error InvalidOracleId();
-    error InvalidCommitment();
-    error InvalidRequestParameters();
-    error FailedToFulfillRandomness();
-
     constructor(address _blockHashStore) {
         oracles[ORACLE_ID] = ORACLE_ADDRESS;
         blockHashStore = BlockHashStore(_blockHashStore);
