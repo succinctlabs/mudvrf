@@ -1,6 +1,6 @@
 import {VRF} from "./types/ethers-contracts/VRFCoordinator";
 import {MockVRFCoordinator, RandomnessRequestEventObject} from "./types/ethers-contracts/MockVRFCoordinator";
-import {MockVRFCoordinator__factory} from "./types/ethers-contracts/factories/MockVRFCoordinator__Factory";
+import {MockVRFCoordinator__factory} from "../../contracts/types/ethers-contracts/factories/MockVRFCoordinator__Factory";
 import { ethers, utils } from 'ethers';
 import { AbiCoder } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
