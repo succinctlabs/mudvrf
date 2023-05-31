@@ -3,9 +3,9 @@ pragma solidity >=0.8.0;
 
 import {System} from "@latticexyz/world/src/System.sol";
 
-import {VRF} from "./VRF.sol";
-import {VRFCoordinator} from "./VRFCoordinator.sol";
-import {VRFCoordinatorAddress} from "./tables/VRFCoordinatorAddress.sol";
+import {VRF} from "src/modules/vrf/VRF.sol";
+import {VRFCoordinator} from "src/modules/vrf/VRFCoordinator.sol";
+import {VRFCoordinatorAddress} from "src/modules/vrf/tables/VRFCoordinatorAddress.sol";
 
 /// @title VRFCoordinatorSystem
 /// @notice This contract handles requests and fulfillments of random words from a VRF.

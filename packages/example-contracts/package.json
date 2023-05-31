@@ -1,5 +1,5 @@
 {
-  "name": "@succinctlabs/mudvrf-contracts",
+  "name": "@succinctlabs/mudvrf-example-contracts",
   "version": "0.0.0",
   "private": true,
   "license": "MIT",
@@ -29,7 +29,8 @@
     "@latticexyz/store": "2.0.0-alpha.1.196",
     "@latticexyz/world": "2.0.0-alpha.1.196",
     "@latticexyz/config": "2.0.0-alpha.1.196",
-    "ethers": "^5.7.2"
+    "ethers": "^5.7.2",
+    "@succinctlabs/mudvrf-contracts": "workspace:*"
   },
   "devDependencies": {
     "@typechain/ethers-v5": "^10.2.0",

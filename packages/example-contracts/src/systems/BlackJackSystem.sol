@@ -5,7 +5,7 @@ import {System} from "@latticexyz/world/src/System.sol";
 
 import {RequestIdToBlackJackUser, BlackJack} from "../Tables.sol";
 import {IBlackJackSystem} from "../world/IBlackJackSystem.sol";
-import {IVRFCoordinatorSystem} from "../world/IVRFCoordinatorSystem.sol";
+import {IVRFCoordinatorSystem} from "@succinctlabs/mudvrf/world/IVRFCoordinatorSystem.sol";
 
 contract BlackJackSystem is System {
     bytes32 public constant ORACLE_ID = bytes32(hex"c1ffd3cfee2d9e5cd67643f8f39fd6e51aad88f6f4ce6ab8827279cfffb92266");

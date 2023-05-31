@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import {RLPReader} from "./libraries/RLPReader.sol";
+import {RLPReader} from "src/modules/vrf/libraries/RLPReader.sol";
 
 contract BlockHashStore {
     mapping(uint256 => bytes32) public blockHashes;

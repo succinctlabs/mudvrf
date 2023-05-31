@@ -5,9 +5,9 @@ import {IBaseWorld} from "@latticexyz/world/src/interfaces/IBaseWorld.sol";
 import {IModule} from "@latticexyz/world/src/interfaces/IModule.sol";
 import {WorldContext} from "@latticexyz/world/src/WorldContext.sol";
 
-import {VRFCoordinator} from "./VRFCoordinator.sol";
-import {VRFCoordinatorSystem} from "./VRFCoordinatorSystem.sol";
-import {NAMESPACE, MODULE_NAME, SYSTEM_NAME, TABLE_NAME} from "./constants.sol";
+import {VRFCoordinator} from "src/modules/vrf/VRFCoordinator.sol";
+import {VRFCoordinatorSystem} from "src/modules/vrf/VRFCoordinatorSystem.sol";
+import {NAMESPACE, MODULE_NAME, SYSTEM_NAME, TABLE_NAME} from "src/modules/vrf/constants.sol";
 
 contract VRFCoordinatorModule is IModule, WorldContext {
     VRFCoordinatorSystem public immutable vrfCoordinatorSystem = new VRFCoordinatorSystem();
