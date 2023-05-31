@@ -2,11 +2,10 @@
 pragma solidity >=0.8.0;
 
 import {System} from "@latticexyz/world/src/System.sol";
-import {
-    RaffleCounter, RaffleTable, RequestIdToRaffleId, RequestIdToBlackJackUser, BlackJack
-} from "../codegen/Tables.sol";
-import {IVRFSystem} from "../codegen/world/IVRFSystem.sol";
-import {IBlackJackSystem} from "../codegen/world/IBlackJackSystem.sol";
+
+import {RequestIdToBlackJackUser, BlackJack} from "../Tables.sol";
+import {IBlackJackSystem} from "../world/IBlackJackSystem.sol";
+import {IVRFCoordinatorSystem} from "../world/IVRFCoordinatorSystem.sol";
 
 contract BlackJackSystem is System {
     bytes32 public constant ORACLE_ID = bytes32(hex"c1ffd3cfee2d9e5cd67643f8f39fd6e51aad88f6f4ce6ab8827279cfffb92266");
@@ -15,8 +14,8 @@ contract BlackJackSystem is System {
     uint32 public constant NB_WORDS = 52;
 
     function requestRandomness(bytes4 selector) internal returns (bytes32) {
-        bytes32 requestId = IVRFSystem(_world()).requestRandomWords(
-            ORACLE_ID, REQUEST_CONFIRMATIONS, CALLBACK_GAS_LIMIT, NB_WORDS, selector
+        bytes32 requestId = IVRFCoordinatorSystem(_world()).requestRandomWords(
+            ORACLE_ID, NB_WORDS, REQUEST_CONFIRMATIONS, CALLBACK_GAS_LIMIT, selector
         );
         RequestIdToBlackJackUser.set(requestId, _msgSender());
         return requestId;
@@ -102,7 +101,6 @@ contract BlackJackSystem is System {
             BlackJack.setUserWon(user, true);
             BlackJack.setGameEnded(user, true);
         }
-
     }
 
     function standUser() public {

@@ -13,7 +13,7 @@ extra_output_files = [
   "abi",
   "evm.bytecode"
 ]
-fs_permissions = [{ access = "read", path = "./"}]
+fs_permissions = [{ access = "read-write", path = "./"}]
 
 [profile.lattice-testnet]
 eth_rpc_url = "https://follower.testnet-chain.linfra.xyz"

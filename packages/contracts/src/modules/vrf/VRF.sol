@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-struct VRFRequest {
-    uint64 blockNumber;
-    uint32 callbackGasLimit;
-    uint32 nbWords;
-    address sender;
-    bytes4 callbackSelector;
-}
-
 /**
  *
  * @notice Verification of verifiable-random-function (VRF) proofs, following
@@ -535,6 +527,16 @@ contract VRF {
     // Domain-separation tag for the hash used as the final VRF output.
     // Corresponds to vrfRandomOutputHashPrefix in vrf.go
     uint256 internal constant VRF_RANDOM_OUTPUT_HASH_PREFIX = 3;
+
+    struct Request {
+        address sender;
+        uint256 nonce;
+        bytes32 oracleId;
+        uint32 nbWords;
+        uint16 requestConfirmations;
+        uint32 callbackGasLimit;
+        bytes4 callbackSelector;
+    }
 
     struct Proof {
         uint256[2] pk;
