@@ -26,7 +26,7 @@ type WorldDeploymentJSON struct {
 func main() {
 	// Load WorldDeploymentJSON.
 	worldJson := WorldDeploymentJSON{}
-	worldJsonFile, err := os.Open("../packages/contracts/worlds.json")
+	worldJsonFile, err := os.Open("../contracts/worlds.json")
 	if err != nil {
 		panic(err)
 	}
@@ -42,7 +42,7 @@ func main() {
 
 	// Load VRFDeploymentJSON.
 	vrfJson := VRFDeploymentJSON{}
-	vrfJsonFile, err := os.Open("../packages/contracts/vrf.json")
+	vrfJsonFile, err := os.Open("../contracts/vrf.json")
 	if err != nil {
 		panic(err)
 	}
