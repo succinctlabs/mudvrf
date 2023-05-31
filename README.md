@@ -8,7 +8,7 @@
 
 Install the MUDVRF dependencies into the package where your contracts live.
 
-```bash
+```sh
 cd packages/contracts
 pnpm add @succinctlabs/mudvrf-contracts
 pnpm add @succinctlabs/mudvrf-relayer
@@ -16,7 +16,7 @@ pnpm add @succinctlabs/mudvrf-relayer
 
 Import and use the `VRFCoordinator` inside systems within your MUD project.
 
-```c++
+```solidity
 import {System} from "@latticexyz/world/src/System.sol";
 
 import {IVRFCoordinatorSystem} from "@succinctlabs/mudvrf/world/IVRFCoordinatorSystem.sol";
@@ -34,12 +34,13 @@ contract YourSystem is System {
             NB_WORDS, 
             REQUEST_CONFIRMATIONS,
             CALLBACK_GAS_LIMIT,
-            IYourSystem.handleDealCards
+            IYourSystem.handleDealCards.selector
         );
         return requestId;
     }
 
     function handleDealCards(bytes32 requestId, uint256[] randomWords) {
+        // Your logic here!
         ...
     }
 }
