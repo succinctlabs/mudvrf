@@ -115,8 +115,12 @@ contract BlackJackSystem is System {
         address user = RequestIdToBlackJackUser.get(requestId);
         uint256[] memory userCards = BlackJack.getUserCards(user);
         uint256[] memory dealerCards = BlackJack.getDealerCards(user);
-
         uint256[] memory newDealerCards = new uint256[](dealerCards.length + 1);
+
+        for (uint256 i = 0; i < dealerCards.length; i++) {
+            newDealerCards[i] = dealerCards[i];
+        }
+
         newDealerCards[dealerCards.length] = randomWords[0] % 52;
         BlackJack.setDealerCards(user, newDealerCards);
 

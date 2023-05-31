@@ -208,8 +208,8 @@ export const App = () => {
             Game Ended: {game.value.gameEnded ? "Yes" : "No"}
             </div>
           <br></br>
-          <button onClick={dealUser}>Hit</button>
-          <button onClick={standUser} style={{ marginLeft: "6px" }}>
+          <button onClick={dealUser} disabled={game.value.gameEnded}>Hit</button>
+          <button onClick={standUser} disabled={game.value.gameEnded} style={{ marginLeft: "6px" }}>
             Stand
           </button>
         </div>
