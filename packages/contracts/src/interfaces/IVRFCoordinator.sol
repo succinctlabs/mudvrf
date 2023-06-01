@@ -9,6 +9,7 @@ interface IVRFCoordinator {
         uint32 _nbWords,
         uint16 _requestConfirmations,
         uint32 _callbackGasLimit,
+        address _callbackAddress,
         bytes4 _callbackSelector
     ) external returns (bytes32);
 

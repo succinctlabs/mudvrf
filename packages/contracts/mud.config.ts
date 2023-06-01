@@ -2,6 +2,7 @@ import { mudConfig } from "@latticexyz/world/register";
 
 export default mudConfig({
   codegenDirectory: "",
+  namespace: "vrfCoordinator",
   tables: {
     VRFCoordinatorAddress: {
       keySchema: {},

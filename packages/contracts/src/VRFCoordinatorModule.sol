@@ -4,6 +4,7 @@ pragma solidity >=0.8.0;
 import {IBaseWorld} from "@latticexyz/world/src/interfaces/IBaseWorld.sol";
 import {IModule} from "@latticexyz/world/src/interfaces/IModule.sol";
 import {WorldContext} from "@latticexyz/world/src/WorldContext.sol";
+import { getTargetTableSelector } from "@latticexyz/world/src/modules/utils/getTargetTableSelector.sol";
 
 import {VRFCoordinator} from "./VRFCoordinator.sol";
 import {VRFCoordinatorSystem} from "./VRFCoordinatorSystem.sol";
@@ -24,11 +25,20 @@ contract VRFCoordinatorModule is IModule, WorldContext {
         world.registerSystem(NAMESPACE, SYSTEM_NAME, vrfCoordinatorSystem, true);
 
         // Register tables
-        world.registerTable(
+        bytes32 resourceSelector = world.registerTable(
             NAMESPACE,
             TABLE_NAME,
             VRFCoordinatorAddress.getSchema(),
             VRFCoordinatorAddress.getKeySchema()
+        );
+
+        // Register metadata for tables
+        (string memory tableName, string[] memory fieldNames) = VRFCoordinatorAddress.getMetadata();
+        IBaseWorld(_world()).setMetadata(
+            NAMESPACE,
+            TABLE_NAME,
+            tableName,
+            fieldNames
         );
 
         // Register system functions
@@ -36,7 +46,7 @@ contract VRFCoordinatorModule is IModule, WorldContext {
             NAMESPACE, SYSTEM_NAME, "setCoordinator", "(address)"
         );
         world.registerFunctionSelector(
-            NAMESPACE, SYSTEM_NAME, "requestRandomWords", "(bytes32,uint16,uint32,uint32,bytes4)"
+            NAMESPACE, SYSTEM_NAME, "requestRandomWords", "(bytes32,uint32,uint16,uint32,bytes4)"
         );
     }
 }

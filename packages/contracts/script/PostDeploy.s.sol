@@ -13,18 +13,18 @@ contract PostDeploy is Script {
 
     function run(address worldAddress) external {
         // Load the private key from the `PRIVATE_KEY` environment variable (in .env)
-        uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        // uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
-        // Deploy VRFCoordinator & Set Coordinator
-        vm.startBroadcast(deployerPrivateKey);
-        address blockHashStore = address(new BlockHashStore());
-        address coordinator = address(new VRFCoordinator(blockHashStore));
-        IWorld(worldAddress).setCoordinator(coordinator);
-        vm.stopBroadcast();
+        // // Deploy VRFCoordinator & Set Coordinator
+        // vm.startBroadcast(deployerPrivateKey);
+        // address blockHashStore = address(new BlockHashStore());
+        // address coordinator = address(new VRFCoordinator(blockHashStore));
+        // IWorld(worldAddress).setCoordinator(coordinator);
+        // vm.stopBroadcast();
 
-        string memory obj1 = "vrfCoordinatorDeployment";
-        string memory finalJson = vm.serializeAddress(obj1, "vrfCoordinatorAddress", coordinator);
-        finalJson = vm.serializeAddress(obj1, "blockHashStoreAddress", blockHashStore);
-        vm.writeJson(finalJson, "./vrf.json");
+        // string memory obj1 = "vrfCoordinatorDeployment";
+        // string memory finalJson = vm.serializeAddress(obj1, "vrfCoordinatorAddress", coordinator);
+        // finalJson = vm.serializeAddress(obj1, "blockHashStoreAddress", blockHashStore);
+        // vm.writeJson(finalJson, "./vrf.json");
     }
 }

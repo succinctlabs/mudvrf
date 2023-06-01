@@ -6,7 +6,7 @@ import { defineComponent, Type as RecsType, World } from "@latticexyz/recs";
 export function defineContractComponents(world: World) {
   return {
     VRFCoordinatorAddress: (() => {
-      const tableId = new TableId("", "VRFCoordinatorAd");
+      const tableId = new TableId("vrfCoordinator", "VRFCoordinatorAd");
       return defineComponent(
         world,
         {

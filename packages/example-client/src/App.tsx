@@ -19,66 +19,51 @@ export const App = () => {
     set();
   }, [worldContract.signer]);
 
-  const game = useRow(storeCache, {
-    table: "BlackJack",
-    key: { userAddress: address as any },
-  });
+  // const game = useRow(storeCache, {
+  //   table: "BlackJack",
+  //   key: { userAddress: address as any },
+  // });
 
-  console.log(address, game);
-  
-  const onProofChangeHandler = (event: any) => {
-    console.log(JSON.parse(event.target.value));
-  };
+  // console.log("game", address, game);
 
-  const onRequestChangeHandler = (event: any) => {
-    console.log(JSON.parse(event.target.value));
-  };
+  // worldContract.on("StoreSetRecord", (table, key, data) => {
+  //   if (
+  //     table !==
+  //     "0x00000000000000000000000000000000565246526571756573745461626c6556"
+  //   ) {
+  //     console.log("wrong table", table);
+  //     return;
+  //   }
 
-  const [msgSender, setMsgSender] = useState("");
-  const [nonce, setNonce] = useState(BigInt(0));
-  const [blockNumber, setBlockNumber] = useState(BigInt(0));
-  const [callbackGasLimit, setCallbackGasLimit] = useState(BigInt(0));
-  const [nbWords, setNbWords] = useState(BigInt(0));
-  const [callbackSelector, setCallbackSelector] = useState("");
+  //   const bytes: string = data.slice(2);
 
-  worldContract.on("StoreSetRecord", (table, key, data) => {
-    if (
-      table !==
-      "0x00000000000000000000000000000000565246526571756573745461626c6556"
-    ) {
-      console.log("wrong table", table);
-      return;
-    }
+  //   let offset = 0;
+  //   const msgSender = "0x" + bytes.slice(offset, offset + 40);
+  //   offset += 40;
 
-    const bytes: string = data.slice(2);
+  //   const nonce = BigInt("0x" + bytes.slice(offset, offset + 64));
+  //   offset += 64;
 
-    let offset = 0;
-    const msgSender = "0x" + bytes.slice(offset, offset + 40);
-    offset += 40;
+  //   const blockNumber = BigInt("0x" + bytes.slice(offset, offset + 64));
+  //   offset += 64;
 
-    const nonce = BigInt("0x" + bytes.slice(offset, offset + 64));
-    offset += 64;
+  //   const callbackGasLimit = BigInt("0x" + bytes.slice(offset, offset + 8));
+  //   offset += 8;
 
-    const blockNumber = BigInt("0x" + bytes.slice(offset, offset + 64));
-    offset += 64;
+  //   const nbWords = BigInt("0x" + bytes.slice(offset, offset + 8));
+  //   offset += 8;
 
-    const callbackGasLimit = BigInt("0x" + bytes.slice(offset, offset + 8));
-    offset += 8;
+  //   const callbackSelector = "0x" + bytes.slice(offset, offset + 8);
+  //   offset += 8;
 
-    const nbWords = BigInt("0x" + bytes.slice(offset, offset + 8));
-    offset += 8;
-
-    const callbackSelector = "0x" + bytes.slice(offset, offset + 8);
-    offset += 8;
-
-    // console.log(msgSender, nonce, blockNumber, callbackGasLimit, nbWords, callbackSelector);
-    setMsgSender(msgSender);
-    setNonce(nonce);
-    setBlockNumber(blockNumber);
-    setCallbackGasLimit(callbackGasLimit);
-    setNbWords(nbWords);
-    setCallbackSelector(callbackSelector);
-  });
+  //   // console.log(msgSender, nonce, blockNumber, callbackGasLimit, nbWords, callbackSelector);
+  //   setMsgSender(msgSender);
+  //   setNonce(nonce);
+  //   setBlockNumber(blockNumber);
+  //   setCallbackGasLimit(callbackGasLimit);
+  //   setNbWords(nbWords);
+  //   setCallbackSelector(callbackSelector);
+  // });
 
   const CARDS = [
     "A",
@@ -139,7 +124,7 @@ export const App = () => {
         Start game
       </button>
       <h2>CURRENT GAME:</h2>
-      {game === undefined ||
+      {/* {game === undefined ||
       game === null ||
       game.value.userCards === undefined ? (
         <div>NO GAME</div>
@@ -167,7 +152,7 @@ export const App = () => {
             Stand
           </button>
         </div>
-      )}
+      )} */}
       <br></br>
       <br></br>
     </div>
