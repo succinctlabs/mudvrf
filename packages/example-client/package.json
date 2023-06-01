@@ -1,5 +1,5 @@
 {
-  "name": "client",
+  "name": "example-client",
   "version": "0.0.0",
   "private": true,
   "license": "MIT",
@@ -23,10 +23,11 @@
     "@latticexyz/utils": "2.0.0-alpha.1.196",
     "@latticexyz/world": "2.0.0-alpha.1.196",
     "@wagmi/chains": "^0.2.22",
-    "contracts": "workspace:*",
+    "@succinctlabs/mudvrf": "workspace:*",
     "ethers": "^5.7.2",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "@succinctlabs/mudvrf-example-contracts": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^18.2.6",
