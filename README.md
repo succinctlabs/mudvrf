@@ -10,6 +10,27 @@ Accessing secure randomness on apps built ontop of [MUD](https://mud.dev/) is di
 
 ## Get Started
 
+Begin the MUD development server.
+```
+git clone https://github.com/succinctlabs/mudvrf.git
+cd mudvrf
+pnpm install
+pnpm run dev
+```
+Once the development server is ready, in another terminal, run the typescript mock relayer. This relayer will not use the VRF and instead use randomness available from your operating system (to use the real VRF, goto [Installing VRF]()).
+```
+cd mudvrf
+cd packages/mock-relayer
+pnpm run dev
+```
+
+**Open `localhost:3000` in your browser and play some BlackJack!**
+
+## Insalling MUDVRF
+
+This section explains how MUDVRF can be installed into your MUD project and how to use the VRF instead
+of the mock randomness.
+
 Install the MUDVRF dependencies into the package where your MUD contracts live.
 
 ```sh
@@ -65,9 +86,18 @@ cd packages/prover
 pnpm run dev
 ```
 
-## Mock Proving
+You will see an output like this.
+```
+World Address: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+VRFCoordinator Address: 0x7a2088a1bFc9d81c55368AE168C2C02570cB814F
+BlockHashStore Address: 0x4A679253410272dd5232B3Ff7cF5dbB88f295319
 
-If you would like to avoid spending time installing Go, you can instead deploy the `MockVRFCoordinator` with `MOCK_VRF_COORDINATOR=true` and use the `mock-prover` package with `cd packages/mock-prover; pnpm run dev`. 
+Starting VRFRequestWatcher...
+Oracle: c1ffd3cfee2d9e5cd67643f8f39fd6e51aad88f6f4ce6ab8827279cfffb92266
+64
+
+Listening for RequestRandomWords events...
+```
 
 ## Repo Structure
 
@@ -77,7 +107,7 @@ If you would like to avoid spending time installing Go, you can instead deploy t
 ├── packages                
 │   ├── contracts           # Core implementation of MUD module and VRF
 │   ├── prover              # Go implementation of VRF prover
-│   ├── mock-prover         # Example usage of module in MUD Contracts
+│   ├── mock-prover         # Typescript implementation of mock VRF prover
 │   ├── example-contracts   # Example usage of module in a MUD project (solidity)
 │   └── example-client      # Example usage of module in a MUD project (react)
 └── ...
