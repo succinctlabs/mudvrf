@@ -14,10 +14,9 @@ contract BlackJackSystem is System {
     uint32 public constant NB_WORDS = 52;
 
     function requestRandomness(bytes4 selector) internal returns (bytes32) {
-        // bytes32 requestId = IVRFCoordinatorSystem(_world()).vrfCoordinator_VRFCoordinatorSy_requestRandomWords(
-        //     ORACLE_ID, NB_WORDS, REQUEST_CONFIRMATIONS, CALLBACK_GAS_LIMIT, selector
-        // );
-        bytes32 requestId = bytes32(0);
+        bytes32 requestId = IVRFCoordinatorSystem(_world()).vrfCoordinator_VRFCoordinatorSy_requestRandomWords(
+            ORACLE_ID, NB_WORDS, REQUEST_CONFIRMATIONS, CALLBACK_GAS_LIMIT, selector
+        );
         RequestIdToBlackJackUser.set(requestId, _msgSender());
         return requestId;
     }

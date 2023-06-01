@@ -19,12 +19,12 @@ export const App = () => {
     set();
   }, [worldContract.signer]);
 
-  // const game = useRow(storeCache, {
-  //   table: "BlackJack",
-  //   key: { userAddress: address as any },
-  // });
+  const game = useRow(storeCache, {
+    table: "BlackJack",
+    key: { userAddress: address as any },
+  });
 
-  // console.log("game", address, game);
+  console.log("game", address, game);
 
   // worldContract.on("StoreSetRecord", (table, key, data) => {
   //   if (
@@ -124,7 +124,7 @@ export const App = () => {
         Start game
       </button>
       <h2>CURRENT GAME:</h2>
-      {/* {game === undefined ||
+      {game === undefined ||
       game === null ||
       game.value.userCards === undefined ? (
         <div>NO GAME</div>
@@ -152,7 +152,7 @@ export const App = () => {
             Stand
           </button>
         </div>
-      )} */}
+      )}
       <br></br>
       <br></br>
     </div>
