@@ -4,21 +4,21 @@
 
 ![mudvrf](https://github.com/jtguibas/mudvrf/assets/25734765/09db1c47-3053-47e3-868e-2f2240dbb8aa)
 
-Accessing secure randomness on apps built ontop of [MUD](https://mud.dev/) is difficult today. To solve this proble, the MUDVRF module can get you setup with randomness in your application within minutes.
+Accessing secure randomness on apps built on top of [MUD](https://mud.dev/) can be challenging as you either have to roll your own solution or use on-chain pseudorandomness. To solve this proble, the MUDVRF module can get you setup with randomness generated from a VRF in your application within minutes.
 
 *This project was built during the Autonomous Worlds Hackathon hosted by EthGlobal in 2023*.
 
 ## Get Started
 
 Begin the MUD development server.
-```
+```sh
 git clone https://github.com/succinctlabs/mudvrf.git
 cd mudvrf
 pnpm install
 pnpm run dev
 ```
 Once the development server is ready, in another terminal, run the typescript mock relayer. This relayer will not use the VRF and instead use randomness available from your operating system (to use the real VRF, goto [Installing VRF]()).
-```
+```sh
 cd mudvrf
 cd packages/mock-relayer
 pnpm run dev
