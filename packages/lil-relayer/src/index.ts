@@ -30,9 +30,6 @@ async function main() {
 
     const vrfCoordinator = MockVRFCoordinator__factory.connect(vrfContractAddress, signer);
 
-    console.log("VRF Coordinator Address: ", vrfContractAddress);
-    console.log("Get number of words: ", await vrfCoordinator.MAXIMUM_NB_WORDS());
-
     const handleFulfilledRandomness = async (event: FulfillRandomWordsEvent) => {
         console.log("Randomness fulfilled");
         console.log("requestId: ", BigNumber.from(event.args.requestId).toHexString());
@@ -42,7 +39,6 @@ async function main() {
     const handleRandomnessRequest = async (event: RequestRandomWordsEvent) => {
         // Log all of the parameters
         console.log("Randomness request received");
-        console.log(event);
 
         // Unused in mock
         const proof: VRF.ProofStruct = {
@@ -78,10 +74,11 @@ async function main() {
                     gasLimit: 3000000,
                     gasPrice: ethers.utils.parseUnits('200', 'gwei')
                 });
-                console.log('Transaction submitted:', tx.hash);
-                const receipt = await tx.wait();
+                // console.log('Transaction submitted:', tx.hash);
+                console.log("Submitted fulfillRandomWords transaction");
+                // const receipt = await tx.wait();
           
-                console.log('Transaction mined:', receipt.transactionHash);
+                // console.log('Transaction mined:', receipt.transactionHash);
           
               // Handle the transaction success
               // ...
@@ -94,17 +91,16 @@ async function main() {
           
         submitTransaction();
 
-        console.log("Submitted fulfillRandomWords transaction");
     };
 
-    let latestBlockChecked: number;
+    let latestBlockChecked = await provider.getBlockNumber();
 
     const fetchPastEvents = async () => {
         const requestRandomWordsFilter = vrfCoordinator.filters.RequestRandomWords();
         const fulfillRandomWordsFilter = vrfCoordinator.filters.FulfillRandomWords();
         const latestBlock = await provider.getBlockNumber();
-        const rrwEvents = await vrfCoordinator.queryFilter(requestRandomWordsFilter, latestBlockChecked || 0, latestBlock);
-        const frwEvents = await vrfCoordinator.queryFilter(fulfillRandomWordsFilter, latestBlockChecked || 0, latestBlock);
+        const rrwEvents = await vrfCoordinator.queryFilter(requestRandomWordsFilter, latestBlockChecked, latestBlock);
+        const frwEvents = await vrfCoordinator.queryFilter(fulfillRandomWordsFilter, latestBlockChecked, latestBlock);
         rrwEvents.forEach(handleRandomnessRequest);
         frwEvents.forEach(handleFulfilledRandomness);
         latestBlockChecked = latestBlock + 1; // to avoid duplicate event fetching
