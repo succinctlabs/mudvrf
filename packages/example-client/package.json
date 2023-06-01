@@ -9,7 +9,8 @@
     "dev": "wait-port localhost:8545 && vite",
     "initialize": "pnpm build",
     "preview": "vite preview",
-    "test": "tsc --noEmit"
+    "test": "tsc --noEmit",
+    "typechain": "typechain --target ethers-v5 '../example-contracts/out/**/*.abi.json'"
   },
   "dependencies": {
     "@ethersproject/providers": "^5.7.2",

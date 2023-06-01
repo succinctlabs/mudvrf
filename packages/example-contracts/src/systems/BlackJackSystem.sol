@@ -13,6 +13,8 @@ contract BlackJackSystem is System {
     uint32 public constant CALLBACK_GAS_LIMIT = 10000000;
     uint32 public constant NB_WORDS = 52;
 
+    error InvalidBlackJackUser();
+
     function requestRandomness(bytes4 selector) internal returns (bytes32) {
         bytes32 requestId = IVRFCoordinatorSystem(_world()).vrfCoordinator_VRFCoordinatorSy_requestRandomWords(
             ORACLE_ID, NB_WORDS, REQUEST_CONFIRMATIONS, CALLBACK_GAS_LIMIT, selector
@@ -54,7 +56,9 @@ contract BlackJackSystem is System {
 
     function handleStartGame(bytes32 requestId, uint256[] memory randomWords) public {
         address user = RequestIdToBlackJackUser.get(requestId);
-
+        if (user == address(0)) {
+            revert InvalidBlackJackUser();
+        }
         uint256[] memory userCards = new uint256[](2);
         userCards[0] = randomWords[0] % 52;
         userCards[1] = randomWords[1] % 52;
@@ -111,8 +115,12 @@ contract BlackJackSystem is System {
         address user = RequestIdToBlackJackUser.get(requestId);
         uint256[] memory userCards = BlackJack.getUserCards(user);
         uint256[] memory dealerCards = BlackJack.getDealerCards(user);
-
         uint256[] memory newDealerCards = new uint256[](dealerCards.length + 1);
+
+        for (uint256 i = 0; i < dealerCards.length; i++) {
+            newDealerCards[i] = dealerCards[i];
+        }
+
         newDealerCards[dealerCards.length] = randomWords[0] % 52;
         BlackJack.setDealerCards(user, newDealerCards);
 

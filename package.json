@@ -6,6 +6,7 @@
     "dev": "concurrently -n contracts,client -c cyan,magenta \"cd packages/example-contracts && pnpm run dev\" \"cd packages/example-client && pnpm run dev\"",
     "dev:client": "pnpm --filter 'client' run dev",
     "dev:contracts": "pnpm --filter 'contracts' dev",
+    "dev:mock-prover": "pnpm --filter 'mock-prover' dev",
     "foundry:up": "curl -L https://foundry.paradigm.xyz | bash && bash $HOME/.foundry/bin/foundryup",
     "initialize": "pnpm recursive run initialize",
     "mud:up": "pnpm recursive exec mud set-version -v canary && pnpm install",
