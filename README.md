@@ -10,44 +10,77 @@ Accessing secure randomness on apps built ontop of [MUD](https://mud.dev/) is di
 
 ## Get Started
 
-Install the MUDVRF dependencies into the package where your contracts live.
+Install the MUDVRF dependencies into the package where your MUD contracts live.
 
 ```sh
-cd packages/contracts
 pnpm add @succinctlabs/mudvrf-contracts
-pnpm add @succinctlabs/mudvrf-relayer
 ```
 
-Import and use the `VRFCoordinator` inside systems within your MUD project.
-
+Deploy the MUDVRF contracts within your post deploy script (i.e., `PostDeploy.s.sol`). View this [script]() as a reference.
 ```solidity
-import {System} from "@latticexyz/world/src/System.sol";
+function run(address worldAddress) external {
+    // Load the private key from the `PRIVATE_KEY` environment variable (in .env)
+    uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
-import {IVRFCoordinatorSystem} from "@succinctlabs/mudvrf/world/IVRFCoordinatorSystem.sol";
+    // Deploy VRFCoordinator and set Coordinator
+    vm.startBroadcast(deployerPrivateKey);
+    address blockHashStore = address(new BlockHashStore());
+    address coordinator = address(new VRFCoordinator(blockHashStore));
+    IVRFCoordinatorSystem(worldAddress).mudvrf_VRFCoordinatorSy_setCoordinator(
+        coordinator
+    );
+    vm.stopBroadcast();
 
-contract YourSystem is System {
-
-    bytes32 constant ORACLE_ID = 0xc1ffd3cfee2d9e5cd67643f8f39fd6e51aad88f6f4ce6ab8827279cfffb92266;
-    uint32 constant NB_WORDS = 1;
-    uint16 constant REQUEST_CONFIRMATIONS = 1;
-    uint32 constant CALLBACK_GAS_LIMIT = 100000;
-
-    function dealCard() internal returns (bytes32) {
-        bytes32 requestId = IVRFCoordinatorSystem(_world()).requestRandomWords(
-            ORACLE_ID,
-            NB_WORDS, 
-            REQUEST_CONFIRMATIONS,
-            CALLBACK_GAS_LIMIT,
-            IYourSystem.handleDealCards.selector
-        );
-        return requestId;
-    }
-
-    function handleDealCards(bytes32 requestId, uint256[] randomWords) {
-        // Your logic here!
-        ...
-    }
+    // Write deployment addresses to JSON
+    string memory obj1 = "vrfCoordinatorDeployment";
+    string memory finalJson = vm.serializeAddress(obj1, "vrfCoordinatorAddress", coordinator);
+    finalJson = vm.serializeAddress(obj1, "blockHashStoreAddress", blockHashStore);
+    vm.writeJson(finalJson, "./vrf.json");
 }
+```
+
+Import and use the `VRFCoordinator` inside systems within your MUD project to request randomness. View an example [here]().
+```solidity
+function dealCard() internal returns (bytes32) {
+    IVRFCoordinator coordinator = IVRFCoordinatorSystem(_world());
+    bytes32 requestId = coordinator.mudvrf_VRFCoordinatorSy_requestRandomWords(
+        ORACLE_ID,
+        NB_WORDS,
+        REQUEST_CONFIRMATIONS,
+        CALLBACK_GAS_LIMIT,
+        selector
+    );
+    return requestId;
+}
+
+function handleDealCards(bytes32 requestId, uint256[] randomWords) {
+    // Your logic here!
+    ...
+}
+```
+
+Run a VRF prover. You must install Go 1.18+ to generate the proofs.
+```
+cd packages/prover
+pnpm run dev
+```
+
+## Mock Proving
+
+If you would like to avoid spending time installing Go, you can instead deploy the `MockVRFCoordinator` with `MOCK_VRF_COORDINATOR=true` and use the `mock-prover` package with `cd packages/mock-prover; pnpm run dev`. 
+
+## Repo Structure
+
+```
+.
+├── ...
+├── packages                
+│   ├── contracts           # Core implementation of MUD module and VRF
+│   ├── prover              # Go implementation of VRF prover
+│   ├── mock-prover         # Example usage of module in MUD Contracts
+│   ├── example-contracts   # Example usage of module in a MUD project (solidity)
+│   └── example-client      # Example usage of module in a MUD project (react)
+└── ...
 ```
 
 ## Security 
