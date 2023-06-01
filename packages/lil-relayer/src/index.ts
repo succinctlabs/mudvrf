@@ -1,7 +1,7 @@
-import {VRF} from "./types/ethers-contracts/VRFCoordinator";
-import {VRFCoordinator__factory} from "./types/ethers-contracts/factories/VRFCoordinator__Factory";
-import {MockVRFCoordinator} from "./types/ethers-contracts/MockVRFCoordinator";
-import {MockVRFCoordinator__factory} from "./types/ethers-contracts/factories/MockVRFCoordinator__Factory";
+import {VRF} from "./types/VRFCoordinator";
+import {VRFCoordinator__factory} from "./types/factories/VRFCoordinator__Factory";
+import {MockVRFCoordinator} from "./types/MockVRFCoordinator";
+import {MockVRFCoordinator__factory} from "./types/factories/MockVRFCoordinator__Factory";
 import { ethers, utils } from 'ethers';
 import { AbiCoder } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
