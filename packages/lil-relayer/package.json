@@ -7,12 +7,12 @@
     "build": "npm run typechain && tsc -b",
     "start": "wait-port localhost:8545 && node dist/index.js",
     "dev": "npm run build && npm run start",
-    "typechain": "typechain --target ethers-v5 --out-dir src/types/ '../contracts/abi/*.json'"
+    "typechain": "typechain --target ethers-v5 --out-dir src/types '../example-contracts/abi/?(VRFCoordinator|MockVRFCoordinator|VRF).json'"
   },
   "dependencies": {
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
-    "contracts": "workspace:*",
+    "@succinctlabs/mudvrf-example-contracts": "workspace:*",
     "ethers": "^5.7.2",
     "express": "^4.18.2",
     "fs": "0.0.1-security",

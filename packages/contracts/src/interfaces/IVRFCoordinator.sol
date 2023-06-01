@@ -12,6 +12,7 @@ interface IVRFCoordinator {
         uint32 nbWords,
         uint16 requestConfirmations,
         uint32 callbackGasLimit,
+        address callbackAddress,
         bytes4 callbackSelector
     );
     event FulfillRandomWords(bytes32 requestId);
@@ -29,6 +30,7 @@ interface IVRFCoordinator {
         uint32 _nbWords,
         uint16 _requestConfirmations,
         uint32 _callbackGasLimit,
+        address _callbackAddress,
         bytes4 _callbackSelector
     ) external returns (bytes32);
 

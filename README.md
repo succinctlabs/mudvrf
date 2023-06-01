@@ -6,6 +6,8 @@
 
 Accessing secure randomness on apps built ontop of [MUD](https://mud.dev/) is difficult today. To solve this proble, the MUDVRF module can get you setup with randomness in your application within minutes.
 
+*This project was built during the Autonomous Worlds Hackathon hosted by EthGlobal in 2023*.
+
 ## Get Started
 
 Install the MUDVRF dependencies into the package where your contracts live.

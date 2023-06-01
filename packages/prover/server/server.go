@@ -119,7 +119,7 @@ func (s *VRFRequestWatcher) StoreBlockHash(event *bindings.VRFCoordinatorRequest
 }
 
 func (s *VRFRequestWatcher) FulfillRandomWords(event *bindings.VRFCoordinatorRequestRandomWords) error {
-	seedBytes := vrf.Keccak256AddressAndU256(event.Sender, event.Nonce)
+	seedBytes := vrf.Keccak256AddressAndU256(event.CallbackAddress, event.Nonce)
 	seed := new(big.Int).SetBytes(seedBytes)
 	actualSeedBytes := vrf.Keccak256Pair(seed, event.Raw.BlockHash.Big())
 	actualSeed := new(big.Int).SetBytes(actualSeedBytes)
@@ -163,6 +163,7 @@ func (s *VRFRequestWatcher) FulfillRandomWords(event *bindings.VRFCoordinatorReq
 		NbWords:              event.NbWords,
 		RequestConfirmations: event.RequestConfirmations,
 		CallbackGasLimit:     event.CallbackGasLimit,
+		CallbackAddress:      event.CallbackAddress,
 		CallbackSelector:     [4]byte(event.CallbackSelector),
 		BlockNumber:          event.Raw.BlockNumber,
 	}

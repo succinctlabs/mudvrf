@@ -35,6 +35,7 @@ contract VRFCoordinatorSystem is System, VRF {
             _nbWords,
             _requestConfirmations,
             _callbackGasLimit,
+            _world(),
             _callbackSelector
         );
         return requestId;

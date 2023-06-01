@@ -5,43 +5,8 @@ import { defineComponent, Type as RecsType, World } from "@latticexyz/recs";
 
 export function defineContractComponents(world: World) {
   return {
-    BlackJack: (() => {
-      const tableId = new TableId("", "BlackJack");
-      return defineComponent(
-        world,
-        {
-          userWins: RecsType.BigInt,
-          userLosses: RecsType.BigInt,
-          gameEnded: RecsType.Boolean,
-          userWon: RecsType.Boolean,
-          userCards: RecsType.BigIntArray,
-          dealerCards: RecsType.BigIntArray,
-        },
-        {
-          metadata: {
-            contractId: tableId.toHexString(),
-            tableId: tableId.toString(),
-          },
-        }
-      );
-    })(),
-    RequestIdToBlackJackUser: (() => {
-      const tableId = new TableId("", "RequestIdToBlack");
-      return defineComponent(
-        world,
-        {
-          user: RecsType.String,
-        },
-        {
-          metadata: {
-            contractId: tableId.toHexString(),
-            tableId: tableId.toString(),
-          },
-        }
-      );
-    })(),
     VRFCoordinatorAddress: (() => {
-      const tableId = new TableId("", "VRFCoordinatorAd");
+      const tableId = new TableId("vrfCoordinator", "VRFCoordinatorAd");
       return defineComponent(
         world,
         {

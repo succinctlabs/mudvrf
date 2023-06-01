@@ -53,6 +53,7 @@ contract VRFCoordinator is VRF, IVRFCoordinator {
         uint32 _nbWords,
         uint16 _requestConfirmations,
         uint32 _callbackGasLimit,
+        address _callbackAddress,
         bytes4 _callbackSelector
     ) external returns (bytes32) {
         if (_requestConfirmations < MINIMUM_REQUEST_CONFIRMATIONS) {
@@ -63,7 +64,7 @@ contract VRFCoordinator is VRF, IVRFCoordinator {
             revert InvalidNumberOfWords();
         }
 
-        bytes32 seed = keccak256(abi.encode(msg.sender, nonce));
+        bytes32 seed = keccak256(abi.encode(_callbackAddress, nonce));
         bytes32 requestId = keccak256(abi.encode(_oracleId, seed));
         requests[requestId] = keccak256(
             abi.encode(
@@ -74,6 +75,7 @@ contract VRFCoordinator is VRF, IVRFCoordinator {
                 _nbWords,
                 _requestConfirmations,
                 _callbackGasLimit,
+                _callbackAddress,
                 _callbackSelector
             )
         );
@@ -86,6 +88,7 @@ contract VRFCoordinator is VRF, IVRFCoordinator {
             _nbWords,
             _requestConfirmations,
             _callbackGasLimit,
+            _callbackAddress,
             _callbackSelector
         );
 
@@ -100,10 +103,10 @@ contract VRFCoordinator is VRF, IVRFCoordinator {
         bytes32 oracleId = keccak256(abi.encode(_proof.pk));
         address oracle = oracles[oracleId];
         if (oracle == address(0)) {
-            revert InvalidOracleId();
+            revert("Invalid oracle id");
         }
 
-        bytes32 seed = keccak256(abi.encode(_request.sender, _request.nonce));
+        bytes32 seed = keccak256(abi.encode(_request.callbackAddress, _request.nonce));
         bytes32 requestId = keccak256(abi.encode(oracleId, seed));
         bytes32 commitment = requests[requestId];
         bytes32 expectedCommitment = keccak256(
@@ -115,6 +118,7 @@ contract VRFCoordinator is VRF, IVRFCoordinator {
                 _request.nbWords,
                 _request.requestConfirmations,
                 _request.callbackGasLimit,
+                _request.callbackAddress,
                 _request.callbackSelector
             )
         );
@@ -135,10 +139,10 @@ contract VRFCoordinator is VRF, IVRFCoordinator {
         }
 
         bytes memory fulfillRandomnessCall = abi.encodeWithSelector(_request.callbackSelector, requestId, randomWords);
-        (bool status,) = _request.sender.call(fulfillRandomnessCall);
+        (bool status,) = _request.callbackAddress.call(fulfillRandomnessCall);
 
         if (!status) {
-            revert FailedToFulfillRandomness();
+            revert("Failed to fulfill randomness");
         }
 
         emit FulfillRandomWords(requestId);

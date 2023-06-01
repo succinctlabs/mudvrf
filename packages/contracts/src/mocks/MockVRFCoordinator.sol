@@ -1,11 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
+import {System} from "@latticexyz/world/src/System.sol";
+
 import {VRF} from "../VRF.sol";
 import {IVRFCoordinator} from "../interfaces/IVRFCoordinator.sol";
 import {BlockHashStore} from "../BlockHashStore.sol";
 
-contract MockVRFCoordinator is IVRFCoordinator {
+/// @title MockVRFCoordinator
+/// @notice This mock contract handles requests and fulfillments of random words from a VRF.
+contract MockVRFCoordinator is VRF, IVRFCoordinator {
     /// @notice The oracle identifier used for validating the VRF proof came from the oracle.
     bytes32 public constant ORACLE_ID = 0xc1ffd3cfee2d9e5cd67643f8f39fd6e51aad88f6f4ce6ab8827279cfffb92266;
 
@@ -38,11 +42,18 @@ contract MockVRFCoordinator is IVRFCoordinator {
         blockHashStore = BlockHashStore(_blockHashStore);
     }
 
+    /// @notice Requests random words from the VRF.
+    /// @param _oracleId The address of the operator to get shares for.
+    /// @param _requestConfirmations The number of blocks to wait before posting the VRF request.
+    /// @param _callbackGasLimit The maximum amount of gas the callback can use.
+    /// @param _nbWords The number of random words to request.
+    /// @param _callbackSelector The selector of the callback function.
     function requestRandomWords(
         bytes32 _oracleId,
         uint32 _nbWords,
         uint16 _requestConfirmations,
         uint32 _callbackGasLimit,
+        address _callbackAddress,
         bytes4 _callbackSelector
     ) external returns (bytes32) {
         if (_requestConfirmations < MINIMUM_REQUEST_CONFIRMATIONS) {
@@ -53,7 +64,7 @@ contract MockVRFCoordinator is IVRFCoordinator {
             revert InvalidNumberOfWords();
         }
 
-        bytes32 seed = keccak256(abi.encode(msg.sender, nonce));
+        bytes32 seed = keccak256(abi.encode(_callbackAddress, nonce));
         bytes32 requestId = keccak256(abi.encode(seed));
         requests[requestId] = keccak256(
             abi.encode(
@@ -64,6 +75,7 @@ contract MockVRFCoordinator is IVRFCoordinator {
                 _nbWords,
                 _requestConfirmations,
                 _callbackGasLimit,
+                _callbackAddress,
                 _callbackSelector
             )
         );
@@ -76,6 +88,7 @@ contract MockVRFCoordinator is IVRFCoordinator {
             _nbWords,
             _requestConfirmations,
             _callbackGasLimit,
+            _callbackAddress,
             _callbackSelector
         );
 
@@ -83,11 +96,11 @@ contract MockVRFCoordinator is IVRFCoordinator {
         return requestId;
     }
 
-    function fulfillRandomWords(
-        VRF.Proof memory _proof,
-        VRF.Request memory _request
-    ) external {
-        bytes32 seed = keccak256(abi.encode(_request.sender, _request.nonce));
+    /// @notice Fulfills the request for random words.
+    /// @param _proof The address of the operator to get shares for.
+    /// @param _request The number of shares for the operator.
+    function fulfillRandomWords(VRF.Proof memory _proof, VRF.Request memory _request) external {
+        bytes32 seed = keccak256(abi.encode(_request.callbackAddress, _request.nonce));
         bytes32 requestId = keccak256(abi.encode(seed));
         bytes32 commitment = requests[requestId];
         bytes32 expectedCommitment = keccak256(
@@ -99,6 +112,7 @@ contract MockVRFCoordinator is IVRFCoordinator {
                 _request.nbWords,
                 _request.requestConfirmations,
                 _request.callbackGasLimit,
+                _request.callbackAddress,
                 _request.callbackSelector
             )
         );
@@ -110,17 +124,16 @@ contract MockVRFCoordinator is IVRFCoordinator {
         delete requests[requestId];
 
         uint256 randomness = uint256(keccak256(abi.encodePacked(seed)));
-
         uint256[] memory randomWords = new uint256[](_request.nbWords);
         for (uint256 i = 0; i < _request.nbWords; i++) {
             randomWords[i] = uint256(keccak256(abi.encode(randomness, i)));
         }
 
         bytes memory fulfillRandomnessCall = abi.encodeWithSelector(_request.callbackSelector, requestId, randomWords);
-        (bool status,) = _request.sender.call(fulfillRandomnessCall);
+        (bool status,) = _request.callbackAddress.call(fulfillRandomnessCall);
 
         if (!status) {
-            revert FailedToFulfillRandomness();
+            revert("Failed to fulfill randomness");
         }
 
         emit FulfillRandomWords(requestId);

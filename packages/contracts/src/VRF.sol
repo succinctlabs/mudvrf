@@ -535,6 +535,7 @@ contract VRF {
         uint32 nbWords;
         uint16 requestConfirmations;
         uint32 callbackGasLimit;
+        address callbackAddress;
         bytes4 callbackSelector;
         uint64 blockNumber;
     }
