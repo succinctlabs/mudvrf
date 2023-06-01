@@ -17,16 +17,16 @@ cd mudvrf
 pnpm install
 pnpm run dev
 ```
-Once the development server is ready, in another terminal, run the typescript mock relayer. This relayer will not use the VRF and instead use randomness available from your operating system (to use the real VRF, goto [Installing VRF]()).
+Once the development server is ready, in another terminal, run the typescript mock relayer. This relayer will not use the VRF and instead use randomness available from your operating system (to use the real VRF, set `MOCK_PROVER=false` in your `.env` but you will need to install Go 1.20+).
 ```sh
 cd mudvrf
-cd packages/mock-relayer
+cd packages/mock-prover
 pnpm run dev
 ```
 
 **Open `localhost:3000` in your browser and play some BlackJack!**
 
-## Insalling MUDVRF
+## Installing MUDVRF
 
 This section explains how MUDVRF can be installed into your MUD project and how to use the VRF instead
 of the mock randomness.
