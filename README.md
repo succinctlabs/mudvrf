@@ -17,19 +17,11 @@ cd mudvrf
 pnpm install
 pnpm run dev
 ```
-Once the development server is ready, in another terminal, run the typescript mock relayer. This relayer will not use the VRF and instead use randomness available from your operating system (to use the real VRF, set `MOCK_PROVER=false` in your `.env` but you will need to install Go 1.20+).
-```sh
-cd mudvrf
-cd packages/mock-prover
-pnpm run dev
-```
+Once the development server is ready, in another terminal, run the typescript mock relayer. This relayer will not use the VRF and instead use randomness available from your operating system (to use the real VRF, set `USE_MOCK=false` in `packages/example-contracts/.env` but you will need to install Go 1.20+).
 
 **Open `localhost:3000` in your browser and play some BlackJack!**
 
 ## Installing MUDVRF
-
-This section explains how MUDVRF can be installed into your MUD project and how to use the VRF instead
-of the mock randomness.
 
 Install the MUDVRF dependencies into the package where your MUD contracts live.
 
@@ -37,7 +29,7 @@ Install the MUDVRF dependencies into the package where your MUD contracts live.
 pnpm add @succinctlabs/mudvrf-contracts
 ```
 
-Deploy the MUDVRF contracts within your post deploy script (i.e., `PostDeploy.s.sol`). View this [script]() as a reference.
+Deploy the MUDVRF contracts within your post deploy script (i.e., `PostDeploy.s.sol`). View this [script](https://github.com/succinctlabs/mudvrf/blob/main/packages/example-contracts/script/PostDeploy.s.sol) as a reference.
 ```solidity
 function run(address worldAddress) external {
     // Load the private key from the `PRIVATE_KEY` environment variable (in .env)
@@ -60,7 +52,7 @@ function run(address worldAddress) external {
 }
 ```
 
-Import and use the `VRFCoordinator` inside systems within your MUD project to request randomness. View an example [here]().
+Import and use the `VRFCoordinator` inside systems within your MUD project to request randomness. View an example [here](https://github.com/succinctlabs/mudvrf/blob/main/packages/example-contracts/src/systems/BlackJackSystem.sol#L53-L55).
 ```solidity
 function dealCard() internal returns (bytes32) {
     IVRFCoordinator coordinator = IVRFCoordinatorSystem(_world());
@@ -80,9 +72,16 @@ function handleDealCards(bytes32 requestId, uint256[] randomWords) {
 }
 ```
 
-Run a VRF prover. You must install Go 1.18+ to generate the proofs.
-```
+Run your MUD development server and also run a VRF prover. You must install Go 1.18+ to generate the proofs if `USE_MOCK=false`.
+```sh
+pnpm run dev
+
+# If USE_MOCK=false, run the following commands in a seperate terminal
 cd packages/prover
+pnpm run dev
+
+# If USE_MOCK=true, run the following commands in a seperate terminal
+cd packages/mock-prover
 pnpm run dev
 ```
 
