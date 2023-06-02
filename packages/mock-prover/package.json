@@ -5,9 +5,9 @@
   "license": "MIT",
   "scripts": {
     "build": "npm run typechain && tsc -b",
-    "start": "wait-port localhost:8545 && node dist/index.js",
+    "start": "wait-port localhost:8545 && node dist/index.js $VRF_JSON_PATH",
     "dev": "npm run build && npm run start",
-    "typechain": "typechain --target ethers-v5 --out-dir src/types '../example-contracts/abi/?(VRFCoordinator|MockVRFCoordinator|VRF).json'"
+    "typechain": "typechain --target ethers-v5 --out-dir src/types '../contracts/abi/?(VRFCoordinator|MockVRFCoordinator|VRF).json'"
   },
   "dependencies": {
     "@ethersproject/abi": "^5.7.0",
