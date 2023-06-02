@@ -4,8 +4,10 @@
     "private": true,
     "license": "MIT",
     "scripts": {
-        "dev": "go run main/main.go"
+        "dev": "wait-port localhost:8545 && sleep 10 && go run main/main.go"
     },
-    "devDependencies": {}
+    "devDependencies": {
+        "wait-port": "^1.0.4"
+    }
 }
   
