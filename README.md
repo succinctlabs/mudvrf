@@ -17,7 +17,7 @@ cd mudvrf
 pnpm install
 pnpm run dev
 ```
-Once the development server is ready, in another terminal, run the typescript mock relayer. This relayer will not use the VRF and instead use randomness available from your operating system (to use the real VRF, set `USE_MOCK=false` in `packages/example-contracts/.env` but you will need to install Go 1.20+).
+This setup will not use the VRF and instead use randomness available from your operating system (to use the real VRF, set `USE_MOCK=false` in `packages/example-contracts/.env` but you will need to install Go 1.20+).
 
 **Open `localhost:3000` in your browser and play some BlackJack!**
 
