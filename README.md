@@ -128,3 +128,7 @@ The randomness generated relies on a 1/N honesty assumption between the underlyi
 Our verifiable random function (VRF) implementation is based on the ECVFR (Elliptic Curve Verifiable Random Function) specification, which is an industry-standard approach to constructing VRFs based on elliptic curves. The ECVRF spec is an IETF (Internet Engineering Task Force) standard, and has undergone extensive review to ensure its security and reliability.
 
 That said, the contracts are not fully audited, so please becareful when using this software in production. The only contracts that have been fully audited is the VRF verifier contract, which is a fork of Chainlink's ECVRF implementation.
+
+# Support
+
+If you need help, reach out to [@jtguibas](https://t.me/jtguibas) on Telegram.
