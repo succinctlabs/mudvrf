@@ -3,14 +3,33 @@ import {MockVRFCoordinator__factory} from "./types/factories/MockVRFCoordinator_
 import { ethers, utils } from 'ethers';
 import { BigNumber } from "ethers";
 import fs from "fs/promises";
-
+import yargs from "yargs";
+import { hideBin } from 'yargs/helpers';
 
 async function main() {
     console.log("Listening for randomness requests...");
 
-    const vrfJSONPath = process.argv[3];
-    const rpcURL = process.argv[5];
-    const privateKey = process.argv[7];
+    const argv = await yargs(hideBin(process.argv))
+        .option('vrfJsonPath', {
+        type: 'string',
+        demandOption: true,
+        describe: 'Path to the VRF JSON file'
+        })
+        .option('rpcUrl', {
+        type: 'string',
+        demandOption: true,
+        describe: 'RPC URL'
+        })
+        .option('privateKey', {
+        type: 'string',
+        demandOption: true,
+        describe: 'Private key'
+        })
+        .argv;
+
+    const vrfJSONPath = argv.vrfJsonPath;
+    const rpcURL = argv.rpcUrl;
+    const privateKey = argv.privateKey;
 
     const chainId = 31337;
 
