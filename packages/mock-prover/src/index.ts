@@ -8,8 +8,6 @@ import fs from "fs/promises";
 async function main() {
     console.log("Listening for randomness requests...");
 
-
-    console.log("CLI Args", process.argv);
     // Read CLI args for VRF JSON PATH
     const vrfJSONPath = process.argv[2];
     // Anvil Chain ID
