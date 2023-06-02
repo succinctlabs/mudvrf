@@ -129,6 +129,6 @@ Our verifiable random function (VRF) implementation is based on the ECVFR (Ellip
 
 That said, the contracts are not fully audited, so please becareful when using this software in production. The only contracts that have been fully audited is the VRF verifier contract, which is a fork of Chainlink's ECVRF implementation.
 
-# Support
+## Support
 
 If you need help, reach out to [@jtguibas](https://t.me/jtguibas) on Telegram.
