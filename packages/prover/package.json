@@ -4,7 +4,7 @@
     "private": true,
     "license": "MIT",
     "scripts": {
-        "dev": "go run main/main.go"
+        "dev": "go run main/main.go --worldJsonPath ../example-contracts/worlds.json --vrfJsonPath ../example-contracts/vrf.json"
     },
     "devDependencies": {}
 }
