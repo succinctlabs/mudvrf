@@ -1,2 +1,7 @@
 node_modules
 **/.DS_Store
+.env
+contracts/.env
+example-contracts/.env
+prover/.env
+mock-prover/.env

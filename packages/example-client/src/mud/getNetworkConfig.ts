@@ -26,6 +26,8 @@ export async function getNetworkConfig(): Promise<NetworkConfig> {
     throw new Error(`No world address found for chain ${chainId}. Did you run \`mud deploy\`?`);
   }
 
+  const privateKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
+
   const initialBlockNumber = params.has("initialBlockNumber")
     ? Number(params.get("initialBlockNumber"))
     : world?.blockNumber ?? -1; // -1 will attempt to find the block number from RPC
@@ -41,7 +43,7 @@ export async function getNetworkConfig(): Promise<NetworkConfig> {
       jsonRpcUrl: params.get("rpc") ?? chain.rpcUrls.default.http[0],
       wsRpcUrl: params.get("wsRpc") ?? chain.rpcUrls.default.webSocket?.[0],
     },
-    privateKey: getBurnerWallet().value,
+    privateKey: privateKey,
     chainId,
     modeUrl: params.get("mode") ?? chain.modeUrl,
     faucetServiceUrl: params.get("faucet") ?? chain.faucetUrl,
