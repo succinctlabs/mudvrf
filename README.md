@@ -20,7 +20,7 @@ pnpm run dev
 ```
 This setup will not use the VRF and instead use randomness available from your operating system (to use the real VRF, set `USE_MOCK=false` in `packages/example-contracts/.env` but you will need to install Go 1.20+).
 
-**Open `localhost:3000` in your browser and play some BlackJack!**
+**Open `localhost:3000` in your browser and play some Blackjack!**
 
 ## Installing MUDVRF
 
@@ -59,7 +59,7 @@ function run(address worldAddress) external {
 }
 ```
 
-Import and use the `VRFCoordinator` inside systems within your MUD project to request randomness. View an example [here]().
+Import and use the `VRFCoordinator` inside systems within your MUD project to request randomness. View an example [here](https://github.com/succinctlabs/mudvrf/blob/main/packages/example-contracts/src/systems/BlackJackSystem.sol#L53-L55).
 ```solidity
 function dealCard() internal returns (bytes32) {
     IVRFCoordinator coordinator = IVRFCoordinatorSystem(_world());
@@ -128,3 +128,7 @@ The randomness generated relies on a 1/N honesty assumption between the underlyi
 Our verifiable random function (VRF) implementation is based on the ECVFR (Elliptic Curve Verifiable Random Function) specification, which is an industry-standard approach to constructing VRFs based on elliptic curves. The ECVRF spec is an IETF (Internet Engineering Task Force) standard, and has undergone extensive review to ensure its security and reliability.
 
 That said, the contracts are not fully audited, so please becareful when using this software in production. The only contracts that have been fully audited is the VRF verifier contract, which is a fork of Chainlink's ECVRF implementation.
+
+# Support
+
+If you need help, reach out to [@jtguibas](https://t.me/jtguibas) on Telegram.
