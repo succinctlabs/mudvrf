@@ -14,7 +14,7 @@ then
         "cd packages/example-client && pnpm run dev" \
         "cd packages/prover && VRF_JSON_PATH=$VRF_JSON_PATH RPC_URL=$RPC_URL PRIVATE_KEY=$PRIVATE_KEY pnpm run dev"
 else
-    pnpm concurrently -n contracts,client,prover -c cyan,magenta,blue \
+    pnpm concurrently -n contracts,client,mock-prover -c cyan,magenta,blue \
         "cd packages/example-contracts && pnpm run dev" \
         "cd packages/example-client && pnpm run dev" \
         "cd packages/mock-prover && VRF_JSON_PATH=$VRF_JSON_PATH RPC_URL=$RPC_URL PRIVATE_KEY=$PRIVATE_KEY pnpm run dev"
