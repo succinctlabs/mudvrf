@@ -34,17 +34,23 @@ Deploy the MUDVRF contracts within your post deploy script (i.e., `PostDeploy.s.
 function run(address worldAddress) external {
     // Load the private key from the `PRIVATE_KEY` environment variable (in .env)
     uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+    bool useMock = vm.envBool("USE_MOCK");
 
-    // Deploy VRFCoordinator and set Coordinator
+    // Deploy MUDVRF contracts
     vm.startBroadcast(deployerPrivateKey);
     address blockHashStore = address(new BlockHashStore());
-    address coordinator = address(new VRFCoordinator(blockHashStore));
-    IVRFCoordinatorSystem(worldAddress).mudvrf_VRFCoordinatorSy_setCoordinator(
-        coordinator
-    );
+    address coordinator;
+    if (useMock) {
+        coordinator = address(new MockVRFCoordinator(blockHashStore));
+        console.log("-----MOCK COORDINATOR ADDRESS-----");
+    } else {
+        console.log("-----COORDINATOR ADDRESS-----");
+        coordinator = address(new VRFCoordinator(blockHashStore));
+    }
+    console.logAddress(coordinator);
+    IVRFCoordinatorSystem(worldAddress).mudvrf_VRFCoordinatorSy_setCoordinator(coordinator);
     vm.stopBroadcast();
 
-    // Write deployment addresses to JSON
     string memory obj1 = "vrfCoordinatorDeployment";
     string memory finalJson = vm.serializeAddress(obj1, "vrfCoordinatorAddress", coordinator);
     finalJson = vm.serializeAddress(obj1, "blockHashStoreAddress", blockHashStore);
