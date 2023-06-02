@@ -24,6 +24,7 @@ require (
 	github.com/DataDog/zstd v1.5.2 // indirect
 	github.com/NethermindEth/juno v0.0.0-20220630151419-cbd368b222ac // indirect
 	github.com/VictoriaMetrics/fastcache v1.10.0 // indirect
+	github.com/akamensky/argparse v1.4.0 // indirect
 	github.com/armon/go-metrics v0.4.0 // indirect
 	github.com/ava-labs/avalanchego v1.8.5 // indirect
 	github.com/aybabtme/rgbterm v0.0.0-20170906152045-cc83f3b3ce59 // indirect
