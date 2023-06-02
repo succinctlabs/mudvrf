@@ -10,29 +10,24 @@ import {VRFCoordinator} from "@succinctlabs/mudvrf/src/VRFCoordinator.sol";
 import {MockVRFCoordinator} from "@succinctlabs/mudvrf/src/mocks/MockVRFCoordinator.sol";
 
 contract PostDeploy is Script {
-    uint256 public constant ANVIL_CHAIN_ID = 31337; 
-
     function run(address worldAddress) external {
         // Load the private key from the `PRIVATE_KEY` environment variable (in .env)
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+        bool useMock = vm.envBool("USE_MOCK");
 
-        // Deploy VRFCoordinator & Set Coordinator
+        // Deploy MUDVRF contracts
         vm.startBroadcast(deployerPrivateKey);
         address blockHashStore = address(new BlockHashStore());
-        address coordinator = address(new VRFCoordinator(blockHashStore));
-        IVRFCoordinatorSystem(worldAddress).mudvrf_VRFCoordinatorSy_setCoordinator(
         address coordinator;
-        if (block.chainid == ANVIL_CHAIN_ID) {
+        if (useMock) {
             coordinator = address(new MockVRFCoordinator(blockHashStore));
             console.log("-----MOCK COORDINATOR ADDRESS-----");
         } else {
             console.log("-----COORDINATOR ADDRESS-----");
             coordinator = address(new VRFCoordinator(blockHashStore));
         }
-        IVRFCoordinatorSystem(worldAddress).vrfCoordinator_VRFCoordinatorSy_setCoordinator(
-            coordinator
-        );
-        console.log(coordinator);
+        console.logAddress(coordinator);
+        IVRFCoordinatorSystem(worldAddress).mudvrf_VRFCoordinatorSy_setCoordinator(coordinator);
         vm.stopBroadcast();
 
         string memory obj1 = "vrfCoordinatorDeployment";
