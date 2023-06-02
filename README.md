@@ -58,7 +58,7 @@ function run(address worldAddress) external {
 }
 ```
 
-Import and use the `VRFCoordinator` inside systems within your MUD project to request randomness. View an example [here](https://github.com/succinctlabs/mudvrf/blob/main/packages/example-contracts/src/systems/BlackJackSystem.sol#L53-L55).
+Import and use the `VRFCoordinator` inside systems within your MUD project to request randomness. View an example [here]().
 ```solidity
 function dealCard() internal returns (bytes32) {
     IVRFCoordinator coordinator = IVRFCoordinatorSystem(_world());
