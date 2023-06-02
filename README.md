@@ -17,19 +17,11 @@ cd mudvrf
 pnpm install
 pnpm run dev
 ```
-Once the development server is ready, in another terminal, run the typescript mock relayer. This relayer will not use the VRF and instead use randomness available from your operating system (to use the real VRF, set `MOCK_PROVER=false` in your `.env` but you will need to install Go 1.20+).
-```sh
-cd mudvrf
-cd packages/mock-prover
-pnpm run dev
-```
+This setup will not use the VRF and instead use randomness available from your operating system (to use the real VRF, set `USE_MOCK=false` in `packages/example-contracts/.env` but you will need to install Go 1.20+).
 
 **Open `localhost:3000` in your browser and play some BlackJack!**
 
 ## Installing MUDVRF
-
-This section explains how MUDVRF can be installed into your MUD project and how to use the VRF instead
-of the mock randomness.
 
 Install the MUDVRF dependencies into the package where your MUD contracts live.
 
@@ -37,22 +29,28 @@ Install the MUDVRF dependencies into the package where your MUD contracts live.
 pnpm add @succinctlabs/mudvrf-contracts
 ```
 
-Deploy the MUDVRF contracts within your post deploy script (i.e., `PostDeploy.s.sol`). View this [script]() as a reference.
+Deploy the MUDVRF contracts within your post deploy script (i.e., `PostDeploy.s.sol`). View this [script](https://github.com/succinctlabs/mudvrf/blob/main/packages/example-contracts/script/PostDeploy.s.sol) as a reference.
 ```solidity
 function run(address worldAddress) external {
     // Load the private key from the `PRIVATE_KEY` environment variable (in .env)
     uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
+    bool useMock = vm.envBool("USE_MOCK");
 
-    // Deploy VRFCoordinator and set Coordinator
+    // Deploy MUDVRF contracts
     vm.startBroadcast(deployerPrivateKey);
     address blockHashStore = address(new BlockHashStore());
-    address coordinator = address(new VRFCoordinator(blockHashStore));
-    IVRFCoordinatorSystem(worldAddress).mudvrf_VRFCoordinatorSy_setCoordinator(
-        coordinator
-    );
+    address coordinator;
+    if (useMock) {
+        coordinator = address(new MockVRFCoordinator(blockHashStore));
+        console.log("-----MOCK COORDINATOR ADDRESS-----");
+    } else {
+        console.log("-----COORDINATOR ADDRESS-----");
+        coordinator = address(new VRFCoordinator(blockHashStore));
+    }
+    console.logAddress(coordinator);
+    IVRFCoordinatorSystem(worldAddress).mudvrf_VRFCoordinatorSy_setCoordinator(coordinator);
     vm.stopBroadcast();
 
-    // Write deployment addresses to JSON
     string memory obj1 = "vrfCoordinatorDeployment";
     string memory finalJson = vm.serializeAddress(obj1, "vrfCoordinatorAddress", coordinator);
     finalJson = vm.serializeAddress(obj1, "blockHashStoreAddress", blockHashStore);
@@ -80,9 +78,16 @@ function handleDealCards(bytes32 requestId, uint256[] randomWords) {
 }
 ```
 
-Run a VRF prover. You must install Go 1.18+ to generate the proofs.
-```
+Run your MUD development server and also run a VRF prover. You must install Go 1.18+ to generate the proofs if `USE_MOCK=false`.
+```sh
+pnpm run dev
+
+# If USE_MOCK=false, run the following commands in a seperate terminal
 cd packages/prover
+pnpm run dev
+
+# If USE_MOCK=true, run the following commands in a seperate terminal
+cd packages/mock-prover
 pnpm run dev
 ```
 
@@ -114,6 +119,8 @@ Listening for RequestRandomWords events...
 ```
 
 ## Security 
+
+This code has not yet been audited, and should not be used in any production systems.
 
 The randomness generated relies on a 1/N honesty assumption between the underlying chain operators (i.e., validators or sequencers) and the party holding the secret key corresponding to the VRF (i.e, the prover). This is the same security model used by Chainlink in production for their VRF. In the future, an MPC protocol over the VRF can be used to seamlessly add more parties to the security model.
 
