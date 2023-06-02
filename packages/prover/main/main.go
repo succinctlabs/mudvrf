@@ -9,7 +9,6 @@ import (
 	"github.com/akamensky/argparse"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/joho/godotenv"
 	"github.com/jtguibas/mudvrf/server"
 )
 
@@ -27,12 +26,14 @@ type WorldDeploymentJSON struct {
 func main() {
 	parser := argparse.NewParser("print", "Prints provided string to stdout")
 	vrfJSONPath := parser.String("v", "vrfJsonPath", &argparse.Options{Required: true, Help: "VRF deployment json path"})
+	rpcUrl := parser.String("r", "rpcUrl", &argparse.Options{Required: true, Help: "Ethereum RPC url"})
+	privateKey := parser.String("p", "privateKey", &argparse.Options{Required: true, Help: "Private key of the prover"})
+
 	err := parser.Parse(os.Args)
 	if err != nil {
 		fmt.Print(parser.Usage(err))
 	}
 
-	// Load VRFDeploymentJSON.
 	vrfJson := VRFDeploymentJSON{}
 	vrfJsonFile, err := os.Open(*vrfJSONPath)
 	if err != nil {
@@ -49,18 +50,12 @@ func main() {
 	fmt.Println("VRFCoordinator Address:", vrfJson.VrfCoordinatorAddress)
 	fmt.Println("BlockHashStore Address:", vrfJson.BlockHashStoreAddress)
 
-	// Load enviroment.
-	godotenv.Load()
-	rpcUrl := os.Getenv("RPC_URL")
-	privateKey := os.Getenv("PRIVATE_KEY")
-
-	// Connect to RPC and start server.
-	ethclient, err := ethclient.Dial(rpcUrl)
+	ethclient, err := ethclient.Dial(*rpcUrl)
 	if err != nil {
 		panic(err)
 	}
 	vrfCoordinatorAddress := common.HexToAddress(vrfJson.VrfCoordinatorAddress)
 	blockHashStoreAddress := common.HexToAddress(vrfJson.BlockHashStoreAddress)
-	server := server.New(privateKey, vrfCoordinatorAddress, blockHashStoreAddress, ethclient)
+	server := server.New(*privateKey, vrfCoordinatorAddress, blockHashStoreAddress, ethclient)
 	server.Start()
 }
