@@ -16,7 +16,7 @@ contract BlackJackSystem is System {
     error InvalidBlackJackUser();
 
     function requestRandomness(bytes4 selector) internal returns (bytes32) {
-        bytes32 requestId = IVRFCoordinatorSystem(_world()).vrfCoordinator_VRFCoordinatorSy_requestRandomWords(
+        bytes32 requestId = IVRFCoordinatorSystem(_world()).mudvrf_VRFCoordinatorSy_requestRandomWords(
             ORACLE_ID, NB_WORDS, REQUEST_CONFIRMATIONS, CALLBACK_GAS_LIMIT, selector
         );
         RequestIdToBlackJackUser.set(requestId, _msgSender());

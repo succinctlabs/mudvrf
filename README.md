@@ -4,50 +4,113 @@
 
 ![mudvrf](https://github.com/jtguibas/mudvrf/assets/25734765/09db1c47-3053-47e3-868e-2f2240dbb8aa)
 
-Accessing secure randomness on apps built ontop of [MUD](https://mud.dev/) is difficult today. To solve this proble, the MUDVRF module can get you setup with randomness in your application within minutes.
+Accessing secure randomness on apps built on top of [MUD](https://mud.dev/) can be challenging as you either have to roll your own solution or use on-chain pseudorandomness. To solve this proble, the MUDVRF module can get you setup with randomness generated from a VRF in your application within minutes.
 
 *This project was built during the Autonomous Worlds Hackathon hosted by EthGlobal in 2023*.
 
 ## Get Started
 
-Install the MUDVRF dependencies into the package where your contracts live.
-
+Begin the MUD development server.
 ```sh
-cd packages/contracts
-pnpm add @succinctlabs/mudvrf-contracts
-pnpm add @succinctlabs/mudvrf-relayer
+git clone https://github.com/succinctlabs/mudvrf.git
+cd mudvrf
+pnpm install
+pnpm run dev
+```
+Once the development server is ready, in another terminal, run the typescript mock relayer. This relayer will not use the VRF and instead use randomness available from your operating system (to use the real VRF, set `MOCK_PROVER=false` in your `.env` but you will need to install Go 1.20+).
+```sh
+cd mudvrf
+cd packages/mock-prover
+pnpm run dev
 ```
 
-Import and use the `VRFCoordinator` inside systems within your MUD project.
+**Open `localhost:3000` in your browser and play some BlackJack!**
 
+## Installing MUDVRF
+
+This section explains how MUDVRF can be installed into your MUD project and how to use the VRF instead
+of the mock randomness.
+
+Install the MUDVRF dependencies into the package where your MUD contracts live.
+
+```sh
+pnpm add @succinctlabs/mudvrf-contracts
+```
+
+Deploy the MUDVRF contracts within your post deploy script (i.e., `PostDeploy.s.sol`). View this [script]() as a reference.
 ```solidity
-import {System} from "@latticexyz/world/src/System.sol";
+function run(address worldAddress) external {
+    // Load the private key from the `PRIVATE_KEY` environment variable (in .env)
+    uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
-import {IVRFCoordinatorSystem} from "@succinctlabs/mudvrf/world/IVRFCoordinatorSystem.sol";
+    // Deploy VRFCoordinator and set Coordinator
+    vm.startBroadcast(deployerPrivateKey);
+    address blockHashStore = address(new BlockHashStore());
+    address coordinator = address(new VRFCoordinator(blockHashStore));
+    IVRFCoordinatorSystem(worldAddress).mudvrf_VRFCoordinatorSy_setCoordinator(
+        coordinator
+    );
+    vm.stopBroadcast();
 
-contract YourSystem is System {
-
-    bytes32 constant ORACLE_ID = 0xc1ffd3cfee2d9e5cd67643f8f39fd6e51aad88f6f4ce6ab8827279cfffb92266;
-    uint32 constant NB_WORDS = 1;
-    uint16 constant REQUEST_CONFIRMATIONS = 1;
-    uint32 constant CALLBACK_GAS_LIMIT = 100000;
-
-    function dealCard() internal returns (bytes32) {
-        bytes32 requestId = IVRFCoordinatorSystem(_world()).requestRandomWords(
-            ORACLE_ID,
-            NB_WORDS, 
-            REQUEST_CONFIRMATIONS,
-            CALLBACK_GAS_LIMIT,
-            IYourSystem.handleDealCards.selector
-        );
-        return requestId;
-    }
-
-    function handleDealCards(bytes32 requestId, uint256[] randomWords) {
-        // Your logic here!
-        ...
-    }
+    // Write deployment addresses to JSON
+    string memory obj1 = "vrfCoordinatorDeployment";
+    string memory finalJson = vm.serializeAddress(obj1, "vrfCoordinatorAddress", coordinator);
+    finalJson = vm.serializeAddress(obj1, "blockHashStoreAddress", blockHashStore);
+    vm.writeJson(finalJson, "./vrf.json");
 }
+```
+
+Import and use the `VRFCoordinator` inside systems within your MUD project to request randomness. View an example [here]().
+```solidity
+function dealCard() internal returns (bytes32) {
+    IVRFCoordinator coordinator = IVRFCoordinatorSystem(_world());
+    bytes32 requestId = coordinator.mudvrf_VRFCoordinatorSy_requestRandomWords(
+        ORACLE_ID,
+        NB_WORDS,
+        REQUEST_CONFIRMATIONS,
+        CALLBACK_GAS_LIMIT,
+        selector
+    );
+    return requestId;
+}
+
+function handleDealCards(bytes32 requestId, uint256[] randomWords) {
+    // Your logic here!
+    ...
+}
+```
+
+Run a VRF prover. You must install Go 1.18+ to generate the proofs.
+```
+cd packages/prover
+pnpm run dev
+```
+
+You will see an output like this.
+```
+World Address: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+VRFCoordinator Address: 0x7a2088a1bFc9d81c55368AE168C2C02570cB814F
+BlockHashStore Address: 0x4A679253410272dd5232B3Ff7cF5dbB88f295319
+
+Starting VRFRequestWatcher...
+Oracle: c1ffd3cfee2d9e5cd67643f8f39fd6e51aad88f6f4ce6ab8827279cfffb92266
+64
+
+Listening for RequestRandomWords events...
+```
+
+## Repo Structure
+
+```
+.
+├── ...
+├── packages                
+│   ├── contracts           # Core implementation of MUD module and VRF
+│   ├── prover              # Go implementation of VRF prover
+│   ├── mock-prover         # Typescript implementation of mock VRF prover
+│   ├── example-contracts   # Example usage of module in a MUD project (solidity)
+│   └── example-client      # Example usage of module in a MUD project (react)
+└── ...
 ```
 
 ## Security 
