@@ -6,7 +6,7 @@
 
 Accessing secure randomness on apps built on top of [MUD](https://mud.dev/) can be challenging as you either have to roll your own solution or use on-chain pseudorandomness. To solve this proble, the MUDVRF module can get you setup with randomness generated from a VRF in your application within minutes.
 
-*This project was built during the Autonomous Worlds Hackathon hosted by EthGlobal in 2023*.
+*This project was built during the Autonomous Worlds Hackathon hosted by Lattice and EthGlobal in 2023*.
 
 ## Get Started
 
@@ -18,7 +18,7 @@ cp .env.example .env
 pnpm install
 pnpm run dev
 ```
-This setup will not use the VRF and instead use randomness available from your operating system (to use the real VRF, set `USE_MOCK=false` in `packages/example-contracts/.env` but you will need to install Go 1.20+).
+This setup will not use the VRF and instead use randomness available from your operating system (to use the real VRF, set `USE_MOCK=false` in `.env` but you will need to install Go 1.20+).
 
 **Open `localhost:3000` in your browser and play some Blackjack!**
 
