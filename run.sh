@@ -2,7 +2,9 @@
 source .env
 
 # Choose what private key and whether to use the mock vrf coordinator for contract deployments.
-echo "PRIVATE_KEY=$PRIVATE_KEY\\nUSE_MOCK=$USE_MOCK" > packages/example-contracts/.env
+echo "" > packages/example-contracts/.env
+echo "PRIVATE_KEY=$PRIVATE_KEY" >> packages/example-contracts/.env
+echo "USE_MOCK=$USE_MOCK" >> packages/example-contracts/.env
 
 # Run the prover.
 if [ "$USE_MOCK" == "false" ]

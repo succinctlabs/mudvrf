@@ -56,7 +56,6 @@ func main() {
 	}
 	vrfCoordinatorAddress := common.HexToAddress(vrfJson.VrfCoordinatorAddress)
 	blockHashStoreAddress := common.HexToAddress(vrfJson.BlockHashStoreAddress)
-	*privateKey = (*privateKey)[2:]
 	server := server.New(*privateKey, vrfCoordinatorAddress, blockHashStoreAddress, ethclient)
 	server.Start()
 }
