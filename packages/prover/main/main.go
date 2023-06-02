@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/akamensky/argparse"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/joho/godotenv"
@@ -24,9 +25,17 @@ type WorldDeploymentJSON struct {
 }
 
 func main() {
+	parser := argparse.NewParser("print", "Prints provided string to stdout")
+	worldJSONPath := parser.String("w", "worldJsonPath", &argparse.Options{Required: true, Help: "World deployment json path"})
+	vrfJSONPath := parser.String("v", "vrfJsonPath", &argparse.Options{Required: true, Help: "VRF deployment json path"})
+	err := parser.Parse(os.Args)
+	if err != nil {
+		fmt.Print(parser.Usage(err))
+	}
+
 	// Load WorldDeploymentJSON.
 	worldJson := WorldDeploymentJSON{}
-	worldJsonFile, err := os.Open("../example-contracts/worlds.json")
+	worldJsonFile, err := os.Open(*worldJSONPath)
 	if err != nil {
 		panic(err)
 	}
@@ -42,7 +51,7 @@ func main() {
 
 	// Load VRFDeploymentJSON.
 	vrfJson := VRFDeploymentJSON{}
-	vrfJsonFile, err := os.Open("../example-contracts/vrf.json")
+	vrfJsonFile, err := os.Open(*vrfJSONPath)
 	if err != nil {
 		panic(err)
 	}
