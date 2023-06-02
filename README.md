@@ -14,6 +14,7 @@ Begin the MUD development server.
 ```sh
 git clone https://github.com/succinctlabs/mudvrf.git
 cd mudvrf
+cp .env.example .env
 pnpm install
 pnpm run dev
 ```

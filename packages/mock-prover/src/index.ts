@@ -7,8 +7,6 @@ import yargs from "yargs";
 import { hideBin } from 'yargs/helpers';
 
 async function main() {
-    console.log("Listening for randomness requests...");
-
     const argv = await yargs(hideBin(process.argv))
         .option('vrfJsonPath', {
         type: 'string',
@@ -43,15 +41,26 @@ async function main() {
     const vrfJSON = JSON.parse(await fs.readFile(vrfJSONPath, 'utf8'));
     const vrfContractAddress = vrfJSON.vrfCoordinatorAddress;
 
+    console.log("VRFCoordinator Address:", vrfContractAddress)
+
     const vrfCoordinator = MockVRFCoordinator__factory.connect(vrfContractAddress, signer);
 
+    console.log("\nStarting VRFRequestWatcher...");
+    console.log("\nListening for RequestRandomWords events...")
     const handleFulfilledRandomness = async (event: FulfillRandomWordsEvent) => {
-        console.log("Randomness fulfilled");
-        console.log("Fulfilled on block: ", event.blockNumber);
+        console.log("tx: ", event.transactionHash);
     };
 
     const handleRandomnessRequest = async (event: RequestRandomWordsEvent) => {
-        console.log("Randomness request received");
+        console.log("\nEvent: ", event.args.requestId);
+        console.log("> Sender:", event.args.sender);
+        console.log("> Nonce:", BigNumber.from(event.args.nonce).toNumber());
+        console.log("> OracleId:", event.args.oracleId);
+        console.log("> NbWords:", BigNumber.from(event.args.nbWords).toNumber());
+        console.log("> CallbackGasLimit:", BigNumber.from(event.args.callbackGasLimit).toNumber());
+        console.log("> CallbackAddress:", event.args.callbackAddress);
+        console.log("> CallbackSelector:", event.args.callbackSelector);
+        console.log("> BlockNumber:", BigNumber.from(event.blockNumber).toNumber())
 
         // Proof is unused in mock
         const proof: VRF.ProofStruct = {
@@ -78,22 +87,19 @@ async function main() {
             blockNumber: BigNumber.from(event.blockNumber)
         }
 
-        console.log("nbWords: ", BigNumber.from(event.args.nbWords).toNumber());
-
         async function submitTransaction() {
             try {
-
+                console.log("Fulfilling random words...");
                 const tx = await vrfCoordinator.fulfillRandomWords(proof, request, {
                     gasLimit: 3000000,
                     gasPrice: ethers.utils.parseUnits('200', 'gwei')
                 });
-                console.log("Submitted fulfillRandomWords transaction");
           
               // Handle the transaction success
               // ...
             } catch (error) {
               // Handle revert or exception
-              console.error('Transaction failed:', error);
+              console.error('Error:', error);
               return;
             }
         }
