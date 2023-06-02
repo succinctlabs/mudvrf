@@ -4,7 +4,7 @@
     "private": true,
     "license": "MIT",
     "scripts": {
-        "dev": "wait-port localhost:8545 && sleep 10 && go run main/main.go --vrfJsonPath $VRF_JSON_PATH"
+        "dev": "wait-port localhost:8545 && sleep 10 && go run main/main.go --vrfJsonPath $VRF_JSON_PATH --rpcUrl $RPC_URL --privateKey $PRIVATE_KEY"
     },
     "devDependencies": {
         "wait-port": "^1.0.4"
