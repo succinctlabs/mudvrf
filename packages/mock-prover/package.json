@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "npm run typechain && tsc -b",
-    "start": "wait-port localhost:8545 && node dist/index.js $VRF_JSON_PATH",
+    "start": "wait-port localhost:8545 && sleep 10 && node dist/index.js --vrfJsonPath $VRF_JSON_PATH --rpcUrl $RPC_URL --privateKey $PRIVATE_KEY",
     "dev": "npm run build && npm run start",
     "typechain": "typechain --target ethers-v5 --out-dir src/types '../contracts/abi/?(VRFCoordinator|MockVRFCoordinator|VRF).json'"
   },

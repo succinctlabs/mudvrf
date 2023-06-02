@@ -8,13 +8,15 @@ import fs from "fs/promises";
 async function main() {
     console.log("Listening for randomness requests...");
 
-    const vrfJSONPath = process.argv[2];
+    const vrfJSONPath = process.argv[3];
+    const rpcURL = process.argv[5];
+    const privateKey = process.argv[7];
 
     const chainId = 31337;
 
-    const provider = new ethers.providers.StaticJsonRpcProvider("http://127.0.0.1:8545", chainId);
+    const provider = new ethers.providers.WebSocketProvider(rpcURL, chainId);
 
-    const wallet = new ethers.Wallet("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80", provider);
+    const wallet = new ethers.Wallet('0x'+privateKey, provider);
 
     const signer = wallet.connect(provider);
 
