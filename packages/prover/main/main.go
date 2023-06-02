@@ -26,28 +26,11 @@ type WorldDeploymentJSON struct {
 
 func main() {
 	parser := argparse.NewParser("print", "Prints provided string to stdout")
-	worldJSONPath := parser.String("w", "worldJsonPath", &argparse.Options{Required: true, Help: "World deployment json path"})
 	vrfJSONPath := parser.String("v", "vrfJsonPath", &argparse.Options{Required: true, Help: "VRF deployment json path"})
 	err := parser.Parse(os.Args)
 	if err != nil {
 		fmt.Print(parser.Usage(err))
 	}
-
-	// Load WorldDeploymentJSON.
-	worldJson := WorldDeploymentJSON{}
-	worldJsonFile, err := os.Open(*worldJSONPath)
-	if err != nil {
-		panic(err)
-	}
-	worldsJsonBytes, err := ioutil.ReadAll(worldJsonFile)
-	if err != nil {
-		panic(err)
-	}
-	err = json.Unmarshal(worldsJsonBytes, &worldJson)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("World Address:", worldJson.Foundry.Address)
 
 	// Load VRFDeploymentJSON.
 	vrfJson := VRFDeploymentJSON{}

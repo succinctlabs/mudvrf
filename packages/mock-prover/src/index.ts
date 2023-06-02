@@ -1,16 +1,17 @@
 import {FulfillRandomWordsEvent, RequestRandomWordsEvent, VRF} from "./types/VRFCoordinator";
-import {VRFCoordinator__factory} from "./types/factories/VRFCoordinator__Factory";
-import {MockVRFCoordinator} from "./types/MockVRFCoordinator";
-import { IVRFCoordinatorSystem__factory } from "./types/factories/IVRFCoordinatorSystem__factory"
 import {MockVRFCoordinator__factory} from "./types/factories/MockVRFCoordinator__factory";
 import { ethers, utils } from 'ethers';
-import { AbiCoder } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
 import fs from "fs/promises";
+
 
 async function main() {
     console.log("Listening for randomness requests...");
 
+
+    console.log("CLI Args", process.argv);
+    // Read CLI args for VRF JSON PATH
+    const vrfJSONPath = process.argv[2];
     // Anvil Chain ID
     const chainId = 31337;
 
@@ -25,7 +26,7 @@ async function main() {
 
     // Read address from vrf.json in contracts directory
     // TODO: Parse this in type-safe way
-    const vrfJSON = JSON.parse(await fs.readFile("../example-contracts/vrf.json", 'utf8'));
+    const vrfJSON = JSON.parse(await fs.readFile(vrfJSONPath, 'utf8'));
     const vrfContractAddress = vrfJSON.vrfCoordinatorAddress;
 
     const vrfCoordinator = MockVRFCoordinator__factory.connect(vrfContractAddress, signer);
