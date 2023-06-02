@@ -20,7 +20,7 @@ pnpm run dev
 ```
 This setup will not use the VRF and instead use randomness available from your operating system (to use the real VRF, set `USE_MOCK=false` in `packages/example-contracts/.env` but you will need to install Go 1.20+).
 
-**Open `localhost:3000` in your browser and play some BlackJack!**
+**Open `localhost:3000` in your browser and play some Blackjack!**
 
 ## Installing MUDVRF
 
@@ -59,7 +59,7 @@ function run(address worldAddress) external {
 }
 ```
 
-Import and use the `VRFCoordinator` inside systems within your MUD project to request randomness. View an example [here]().
+Import and use the `VRFCoordinator` inside systems within your MUD project to request randomness. View an example [here](https://github.com/succinctlabs/mudvrf/blob/main/packages/example-contracts/src/systems/BlackJackSystem.sol#L53-L55).
 ```solidity
 function dealCard() internal returns (bytes32) {
     IVRFCoordinator coordinator = IVRFCoordinatorSystem(_world());
