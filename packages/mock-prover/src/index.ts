@@ -3,43 +3,66 @@ import {MockVRFCoordinator__factory} from "./types/factories/MockVRFCoordinator_
 import { ethers, utils } from 'ethers';
 import { BigNumber } from "ethers";
 import fs from "fs/promises";
-
+import yargs from "yargs";
+import { hideBin } from 'yargs/helpers';
 
 async function main() {
-    console.log("Listening for randomness requests...");
+    const argv = await yargs(hideBin(process.argv))
+        .option('vrfJsonPath', {
+        type: 'string',
+        demandOption: true,
+        describe: 'Path to the VRF JSON file'
+        })
+        .option('rpcUrl', {
+        type: 'string',
+        demandOption: true,
+        describe: 'RPC URL'
+        })
+        .option('privateKey', {
+        type: 'string',
+        demandOption: true,
+        describe: 'Private key'
+        })
+        .argv;
 
-    // Read CLI args for VRF JSON PATH
-    const vrfJSONPath = process.argv[2];
-    // Anvil Chain ID
+    const vrfJSONPath = argv.vrfJsonPath;
+    const rpcURL = argv.rpcUrl;
+    const privateKey = argv.privateKey;
+
     const chainId = 31337;
 
-    // TODO: Do we want to parse this?
-    const provider = new ethers.providers.StaticJsonRpcProvider("http://127.0.0.1:8545", chainId);
+    const provider = new ethers.providers.WebSocketProvider(rpcURL, chainId);
 
-    // TODO: Do we want to parse this?
-    const wallet = new ethers.Wallet("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80", provider);
+    const wallet = new ethers.Wallet('0x'+privateKey, provider);
 
     const signer = wallet.connect(provider);
-    // Get the contract address from PostDeploy
 
     // Read address from vrf.json in contracts directory
-    // TODO: Parse this in type-safe way
     const vrfJSON = JSON.parse(await fs.readFile(vrfJSONPath, 'utf8'));
     const vrfContractAddress = vrfJSON.vrfCoordinatorAddress;
 
+    console.log("VRFCoordinator Address:", vrfContractAddress)
+
     const vrfCoordinator = MockVRFCoordinator__factory.connect(vrfContractAddress, signer);
 
+    console.log("\nStarting VRFRequestWatcher...");
+    console.log("\nListening for RequestRandomWords events...")
     const handleFulfilledRandomness = async (event: FulfillRandomWordsEvent) => {
-        console.log("Randomness fulfilled");
-        console.log("requestId: ", BigNumber.from(event.args.requestId).toHexString());
-        console.log("Fulfilled on block: ", event.blockNumber);
+        console.log("tx: ", event.transactionHash);
     };
 
     const handleRandomnessRequest = async (event: RequestRandomWordsEvent) => {
-        // Log all of the parameters
-        console.log("Randomness request received");
+        console.log("\nEvent: ", event.args.requestId);
+        console.log("> Sender:", event.args.sender);
+        console.log("> Nonce:", BigNumber.from(event.args.nonce).toNumber());
+        console.log("> OracleId:", event.args.oracleId);
+        console.log("> NbWords:", BigNumber.from(event.args.nbWords).toNumber());
+        console.log("> CallbackGasLimit:", BigNumber.from(event.args.callbackGasLimit).toNumber());
+        console.log("> CallbackAddress:", event.args.callbackAddress);
+        console.log("> CallbackSelector:", event.args.callbackSelector);
+        console.log("> BlockNumber:", BigNumber.from(event.blockNumber).toNumber())
 
-        // Unused in mock
+        // Proof is unused in mock
         const proof: VRF.ProofStruct = {
             pk: [event.args.requestId, event.args.requestId],
             gamma: [event.args.requestId, event.args.requestId],
@@ -64,26 +87,19 @@ async function main() {
             blockNumber: BigNumber.from(event.blockNumber)
         }
 
-        console.log("nbWords: ", BigNumber.from(event.args.nbWords).toNumber());
-
         async function submitTransaction() {
             try {
-
+                console.log("Fulfilling random words...");
                 const tx = await vrfCoordinator.fulfillRandomWords(proof, request, {
                     gasLimit: 3000000,
                     gasPrice: ethers.utils.parseUnits('200', 'gwei')
                 });
-                // console.log('Transaction submitted:', tx.hash);
-                console.log("Submitted fulfillRandomWords transaction");
-                // const receipt = await tx.wait();
-          
-                // console.log('Transaction mined:', receipt.transactionHash);
           
               // Handle the transaction success
               // ...
             } catch (error) {
               // Handle revert or exception
-              console.error('Transaction failed:', error);
+              console.error('Error:', error);
               return;
             }
         }
@@ -105,16 +121,11 @@ async function main() {
         latestBlockChecked = latestBlock + 1; // to avoid duplicate event fetching
     };
     
-    fetchPastEvents(); // Fetch past events once at startup
+    fetchPastEvents();
     setInterval(fetchPastEvents, 1000); // Fetch new events every second
-
-    // vrfCoordinator.on("RequestRandomWords(bytes32,address,uint256,bytes32,uint32,uint16,uint32,address,bytes4)", handleRandomnessRequest);
-    // vrfCoordinator.on("FulfillRandomWords(bytes32)", handleFulfilledRandomness);
 
     // Handle exit signals
     process.on('SIGINT', () => {
-        // vrfCoordinator.removeAllListeners('RequestRandomWords');
-        // vrfCoordinator.removeAllListeners('FulfillRandomWords');
         console.log('Server shutting down...');
         process.exit();
     });

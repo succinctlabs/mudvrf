@@ -60,12 +60,6 @@ func (s *VRFRequestWatcher) Start() {
 	fmt.Println("\nStarting VRFRequestWatcher...")
 	fmt.Println("Oracle:", hex.EncodeToString(oracleId))
 
-	address, err := s.vrfCoordinator.MAXIMUMNBWORDS(nil)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(address)
-
 	fmt.Println("\nListening for RequestRandomWords events...")
 	requests := make(chan *bindings.VRFCoordinatorRequestRandomWords)
 	s.vrfCoordinator.WatchRequestRandomWords(nil, requests)
@@ -80,6 +74,7 @@ func (s *VRFRequestWatcher) Start() {
 			fmt.Println("> OracleId:", "0x"+hex.EncodeToString(event.OracleId[:]))
 			fmt.Println("> NbWords:", event.NbWords)
 			fmt.Println("> CallbackGasLimit:", event.CallbackGasLimit)
+			fmt.Println("> CallbackAddress:", event.CallbackAddress.Hex())
 			fmt.Println("> CallbackSelector:", "0x"+hex.EncodeToString(event.CallbackSelector[:]))
 			fmt.Println("> BlockNumber:", event.Raw.BlockNumber)
 			fmt.Println("Storing block hash...")
@@ -172,7 +167,7 @@ func (s *VRFRequestWatcher) FulfillRandomWords(event *bindings.VRFCoordinatorReq
 	if err != nil {
 		return fmt.Errorf("fulfilling randomness: %w", err)
 	}
-	fmt.Printf("tx: %+v\n", tx.Hash().Hex())
+	fmt.Printf("> tx: %+v\n", tx.Hash().Hex())
 
 	return nil
 }

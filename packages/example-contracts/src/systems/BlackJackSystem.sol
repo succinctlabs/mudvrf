@@ -121,11 +121,26 @@ contract BlackJackSystem is System {
             newDealerCards[i] = dealerCards[i];
         }
 
-        newDealerCards[dealerCards.length] = randomWords[0] % 52;
+        uint8 idx = 0;
+        newDealerCards[dealerCards.length] = randomWords[idx] % 52;
         BlackJack.setDealerCards(user, newDealerCards);
 
-        uint256[] memory valueOfUserCards = calculateValueOfCards(userCards);
         uint256[] memory valueOfDealerCards = calculateValueOfCards(newDealerCards);
+
+        // Assume ace is 11.
+        while (valueOfDealerCards[1] < 17) {
+            idx++;
+            dealerCards = BlackJack.getDealerCards(user);
+            newDealerCards = new uint256[](dealerCards.length + 1);
+            for (uint256 i = 0; i < dealerCards.length; i++) {
+                newDealerCards[i] = dealerCards[i];
+            }
+            newDealerCards[dealerCards.length] = randomWords[idx] % 52;
+            BlackJack.setDealerCards(user, newDealerCards);
+            valueOfDealerCards = calculateValueOfCards(newDealerCards);
+        }
+
+        uint256[] memory valueOfUserCards = calculateValueOfCards(userCards);
 
         // Tie at 21.
         if (
